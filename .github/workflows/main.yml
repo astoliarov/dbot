@@ -27,4 +27,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: bghji/dbot
           tags: latest
-          path: app/Dockerfile
+          path: app/
