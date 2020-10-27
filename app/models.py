@@ -25,3 +25,22 @@ class ChannelInfo:
 @dataclass
 class Notification:
     user: User
+
+
+@dataclass
+class ChannelActivityNotification:
+    channel_id: int
+    users: typing.List[User]
+
+
+@dataclass
+class ChannelConfig:
+    channel_id: int
+    user_activity_postbacks: typing.List[str]
+    channel_activity_postbacks: typing.List[str]
+
+
+@dataclass
+class ChannelsConfig:
+    token: str
+    channels: typing.List[ChannelConfig]

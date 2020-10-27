@@ -154,6 +154,7 @@ out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
+.pytest_cache/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
@@ -171,3 +172,5 @@ fabric.properties
 volumes/
 
 nohup.out
+app/channel_config/config.json
+app/config/local.py
