@@ -33,7 +33,6 @@ class ChannelConfigSchema(Schema):
 
 
 class ConfigSchema(Schema):
-    token = fields.Str()
     channels = fields.List(fields.Nested(ChannelConfigSchema))
 
     @post_load

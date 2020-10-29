@@ -22,7 +22,6 @@ class DiscordClient(discord.Client):
     async def my_background_task(self):
         await self.wait_until_ready()
         while not self.is_closed():
-            print("start processing")
             await self.processing_service.process()
             await asyncio.sleep(self.check_interval)  # task runs every 60 seconds
 
