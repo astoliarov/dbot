@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dbot.fullname" . }}
+data:
+  config: |
+  {{`
+    {
+      "channels": [
+      {
+        "channel_id": 740097329318854662,
+        "channel_activity_postbacks": [
+          "https://40ccecb88ad6476ed72135f050dd038b.m.pipedream.net/channels?id={{user_id}}&username={{usernames_safe}}"
+        ],
+        "user_activity_postbacks": [
+          "https://40ccecb88ad6476ed72135f050dd038b.m.pipedream.net/user?id={{user_id}}&username={{username}}"
+        ]
+      }
+      ]
+    }
+  `}}

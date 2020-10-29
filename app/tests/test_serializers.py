@@ -46,22 +46,3 @@ def test__ConfigSchema__channel_config_loaded__postback_parsed_correctly():
     assert len(channel.postbacks) == 1
     assert postback == "http://0.0.0.0:8000/?id={{user_id}}&username={{username}}"
 
-
-def test__ConfigSchema__channel_config_loaded__token_correct():
-
-    channels_config = {
-        "token": "token",
-        "channels": [
-            {
-                "channel_id": 132132131,
-                "postbacks": [
-                    "http://0.0.0.0:8000/?id={{user_id}}&username={{username}}"
-                ]
-            }
-        ]
-    }
-
-    serializer = ConfigSchema()
-    loaded = serializer.load(channels_config)
-
-    assert loaded.token == "token"

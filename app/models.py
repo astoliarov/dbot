@@ -42,5 +42,4 @@ class ChannelConfig:
 
 @dataclass
 class ChannelsConfig:
-    token: str
     channels: typing.List[ChannelConfig]

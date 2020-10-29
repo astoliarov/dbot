@@ -1,0 +1,19 @@
+# Default values for dbot.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: bghji/dbot
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+
+fullnameOverride: "dbot-deployment-helm"
+
+
+discord_token: "NzQwMDk2Mzk2MzUwMTkzNzA0.XykCew.sViApzplL772x-kTHpWbAwSXrdU"
