@@ -24,9 +24,6 @@ jobs:
           tags: latest
           path: app/
 
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
