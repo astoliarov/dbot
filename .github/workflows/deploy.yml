@@ -47,8 +47,8 @@ jobs:
 
       - name: Helm upgrade
         run: helm upgrade dbot helm/dbot -f helm/dbot/values.yaml -n default --recreate-pods  \
-        --set discord_token=${{secrets.DISCORD_TOKEN}} \
-        --set-file dbot_config=config.json \
-        --set sentry_dsn=${{secrets.SENTRY_DSN}} \ 
+          --set discord_token=${{secrets.DISCORD_TOKEN}} \
+          --set-file dbot_config=config.json \
+          --set sentry_dsn=${{secrets.SENTRY_DSN}} \
 
 
