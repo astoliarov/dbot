@@ -29,6 +29,8 @@ spec:
               value: "true"
             - name: DBOT_CHANNEL_CONFIG_PATH
               value: "/etc/dbot-config/config"
+            - name: DBOT_SENTRY_DSN
+              value: "{{ .Values.sentry_dsn }}"
       volumes:
         - name: channel-config
           configMap:

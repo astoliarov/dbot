@@ -7,6 +7,7 @@ REDIS_URL = "redis://localhost:6379/0"
 CHANNEL_CONFIG_PATH = "./channel_config/config.json"
 
 DISCORD_TOKEN = ""
+SENTRY_DSN = ""
 
 config = {
     "version": 1,

@@ -1,6 +1,7 @@
 import asyncio
 
 import aioredis
+import sentry_sdk
 
 import config
 import dscrd
@@ -15,6 +16,9 @@ async def init(redis_url):
     return redis
 
 if __name__ == '__main__':
+    if config.SENTRY_DSN:
+        sentry_sdk.init(config.SENTRY_DSN)
+
     loader = JSONLoader()
     channel_config = loader.from_file(config.CHANNEL_CONFIG_PATH)
 
@@ -30,5 +34,7 @@ if __name__ == '__main__':
 
     client.run(config.DISCORD_TOKEN)
 
-    # '740097329318854660'  # channel
-    # '740097329318854656'  # guild
+    @client.event
+    async def on_error(event, *args, **kwargs):
+        """Don't ignore the error, causing Sentry to capture it."""
+        raise
