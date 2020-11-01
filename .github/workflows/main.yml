@@ -26,33 +26,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: bghji/dbot
-          tags: latest
+          tags: ${{GITHUB_SHA::8}}
           path: app/
-
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DO_TOKEN }}
-
-      - name: Save DigitalOcean kubeconfig
-        run: doctl kubernetes cluster kubeconfig save e321d21d-3a08-473c-8733-9b5727e46d47
-
-      # Install helm
-      - name: Install Helm
-        run: |
-          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-
-
-      - name: Write config
-        run: |
-          echo $DBOT_CONFIG > config.json
-          cat config.json
-        shell: bash
-        env:
-          DBOT_CONFIG: ${{secrets.DBOT_CONFIG}}
-
-      - name: Helm upgrade
-        run: |
-          helm upgrade dbot helm/dbot -f helm/dbot/values.yaml -n default --recreate-pods  --set discord_token=${{secrets.DISCORD_TOKEN}} --set-file dbot_config=config.json
-
 
