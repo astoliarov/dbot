@@ -45,8 +45,12 @@ jobs:
 
       - name: Write config
         run: |
-          echo {{secrets.DBOT_CONFIG}} >> config.json
+          echo $DBOT_CONFIG > config.json
           cat config.json
+        shell: bash
+        env:
+          DBOT_CONFIG: ${{secrets.DBOT_CONFIG}}
+
 
 #      - name: Helm upgrade
 #        run: |
