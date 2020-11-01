@@ -26,6 +26,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: bghji/dbot
-          tags: ${{GITHUB_SHA::8}}
+          tags: ${{GITHUB_SHA}}
           path: app/
 
