@@ -1,21 +1,21 @@
 import asyncio
 
 import aioredis
-import sentry_sdk
-
 import config
 import dscrd
+import sentry_sdk
 from channel_config.loader import JSONLoader
-from services import ActivityProcessingService
 from dao import ChannelInfoDAO
 from sender import CallbackService
+from services import ActivityProcessingService
 
 
 async def init(redis_url):
     redis = await aioredis.create_redis_pool(redis_url, timeout=10)
     return redis
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if config.SENTRY_DSN:
         sentry_sdk.init(config.SENTRY_DSN)
 

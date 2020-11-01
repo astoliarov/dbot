@@ -10,9 +10,9 @@ def test__ConfigSchema__channel_config_loaded__channel_id_parsed_correctly():
                 "channel_id": 132132131,
                 "postbacks": [
                     "http://0.0.0.0:8000/?id={{user_id}}&username={{username}}"
-                ]
+                ],
             }
-        ]
+        ],
     }
 
     serializer = ConfigSchema()
@@ -33,9 +33,9 @@ def test__ConfigSchema__channel_config_loaded__postback_parsed_correctly():
                 "channel_id": 740097329318854662,
                 "postbacks": [
                     "http://0.0.0.0:8000/?id={{user_id}}&username={{username}}"
-                ]
+                ],
             }
-        ]
+        ],
     }
 
     serializer = ConfigSchema()
@@ -45,4 +45,3 @@ def test__ConfigSchema__channel_config_loaded__postback_parsed_correctly():
     postback = channel.postbacks[0]
     assert len(channel.postbacks) == 1
     assert postback == "http://0.0.0.0:8000/?id={{user_id}}&username={{username}}"
-

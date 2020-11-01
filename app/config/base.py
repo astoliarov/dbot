@@ -11,10 +11,25 @@ SENTRY_DSN = ""
 
 config = {
     "version": 1,
-    "formatters": {"simple": {"format": "%(asctime)s - %(name)s - %(message)s", }},
-    "handlers": {"console": {"class": "logging.StreamHandler", "level": "DEBUG", "formatter": "simple"}},
+    "formatters": {
+        "simple": {
+            "format": "%(asctime)s - %(name)s - %(message)s",
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "simple",
+        }
+    },
     "loggers": {
-        "debug": {"level": "DEBUG", "handlers": ["console", ]},
+        "debug": {
+            "level": "DEBUG",
+            "handlers": [
+                "console",
+            ],
+        },
     },
 }
 logging_config.dictConfig(config)

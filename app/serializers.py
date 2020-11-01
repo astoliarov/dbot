@@ -1,7 +1,6 @@
 # coding: utf-8
 
 from marshmallow import Schema, fields, post_load
-
 from models import ChannelConfig, ChannelsConfig
 
 
@@ -23,11 +22,11 @@ class ChannelConfigSchema(Schema):
 
     @post_load
     def load_channel_config(self, data, **kwargs):
-        if 'channel_activity_postbacks' not in data:
-            data['channel_activity_postbacks'] = []
+        if "channel_activity_postbacks" not in data:
+            data["channel_activity_postbacks"] = []
 
-        if 'user_activity_postbacks' not in data:
-            data['user_activity_postbacks'] = []
+        if "user_activity_postbacks" not in data:
+            data["user_activity_postbacks"] = []
 
         return ChannelConfig(**data)
 

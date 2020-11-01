@@ -1,10 +1,9 @@
 # coding: utf-8
 import dataclasses
 import json
-
-import aioredis
 import typing
 
+import aioredis
 from models import ChannelInfo, UserActivityInfo
 from serializers import ChannelInfoSchema
 
@@ -17,7 +16,7 @@ class RedisJSONEncoder(json.JSONEncoder):
 
 
 class ChannelInfoDAO:
-    CHANNEL_KEY_PREFIX = 'channel_{channel_id}'
+    CHANNEL_KEY_PREFIX = "channel_{channel_id}"
 
     def __init__(self, client: aioredis.Redis) -> None:
         self.client = client
@@ -41,10 +40,10 @@ class ChannelInfoDAO:
         schema = ChannelInfoSchema()
 
         loaded = schema.loads(data)
-        activities = [UserActivityInfo(**activity) for activity in loaded['activities']]
+        activities = [UserActivityInfo(**activity) for activity in loaded["activities"]]
 
         return ChannelInfo(
-            channel_id=loaded['channel_id'],
-            timestamp=loaded['timestamp'],
+            channel_id=loaded["channel_id"],
+            timestamp=loaded["timestamp"],
             activities=activities,
         )

@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from config import env
+
 from .base import *
 
 DISCORD_TOKEN = env.str(f"{ENV_PREFIX}_DISCORD_TOKEN", "")  # type: ignore

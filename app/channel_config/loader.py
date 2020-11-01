@@ -1,16 +1,13 @@
 # coding: utf-8
 import json
-
 import typing
 
 from marshmallow import EXCLUDE
-
 from models import ChannelsConfig
 from serializers import ConfigSchema
 
 
 class JSONLoader:
-
     def __init__(self):
         self.schema = ConfigSchema(unknown=EXCLUDE)
 
@@ -18,7 +15,7 @@ class JSONLoader:
         return self.schema.load(data)
 
     def from_file(self, path: str) -> ChannelsConfig:
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             data = json.load(f)
 
         return self._validate(data)
