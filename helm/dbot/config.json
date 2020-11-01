@@ -1,0 +1,25 @@
+{
+  "channels": [
+    {
+      "channel_id": 740097329318854662,
+      "channel_activity_postbacks": [
+        "https://hook.integromat.com/g6mfnbh8liy9mdp3ecd5u1x1wvs6yu6f?id={{id}}&username={{usernames_safe}}"
+      ],
+      "user_activity_postbacks": []
+    },
+    {
+      "channel_id": 367336435965231105,
+      "channel_activity_postbacks": [
+        "https://hook.integromat.com/hm87x5va3o4bfciuc4g2wk1vse2ck0g2?id={{id}}&usernames={{usernames_safe}}"
+      ],
+      "user_activity_postbacks": []
+    },
+    {
+      "channel_id": 754278074920468480,
+      "channel_activity_postbacks": [
+        "https://hook.integromat.com/hm87x5va3o4bfciuc4g2wk1vse2ck0g2?id={{id}}&usernames={{usernames_safe}}"
+      ],
+      "user_activity_postbacks": []
+    }
+  ]
+}

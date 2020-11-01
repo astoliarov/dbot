@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: {{ include "dbot.fullname" . }}
 data:
-  config: {{ .Values.dbot_config | indent 4}}
+  config: |
+    `{{ .Values.dbot_config | indent 4}}`
