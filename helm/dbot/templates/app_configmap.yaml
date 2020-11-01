@@ -4,4 +4,4 @@ metadata:
   name: {{ include "dbot.fullname" . }}
 data:
   config: |
-    `{{ .Values.dbot_config | indent 4}}`
+{{ .Values.dbot_config | indent 4 }}
