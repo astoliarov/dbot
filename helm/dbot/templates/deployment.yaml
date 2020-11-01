@@ -24,7 +24,7 @@ spec:
             - name: DBOT_DISCORD_TOKEN
               value: "{{ .Values.discord_token }}"
             - name: DBOT_REDIS_URL
-              value: redis://redis-master
+              value: "{{ .Values.redis_url }}"
             - name: DBOT_ENV_CONFIG
               value: "true"
             - name: DBOT_CHANNEL_CONFIG_PATH

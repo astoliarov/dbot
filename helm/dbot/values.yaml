@@ -16,4 +16,7 @@ nameOverride: ""
 fullnameOverride: "dbot-deployment-helm"
 
 
-discord_token: "NzQwMDk2Mzk2MzUwMTkzNzA0.XykCew.sViApzplL772x-kTHpWbAwSXrdU"
+discord_token: ""
+redis_url: "redis://redis-helm-master"
+dbot_config: ""
+

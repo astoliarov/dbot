@@ -28,3 +28,28 @@ jobs:
           repository: bghji/dbot
           tags: latest
           path: app/
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_TOKEN }}
+
+      - name: Save DigitalOcean kubeconfig
+        run: doctl kubernetes cluster kubeconfig save e321d21d-3a08-473c-8733-9b5727e46d47
+
+      # Install helm
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+
+      - name: Write config
+        run: |
+          echo {{secrets.DBOT_CONFIG}} >> config.json
+          cat config.json
+
+#      - name: Helm upgrade
+#        run: |
+#          helm upgrade dbot helm/dbot -f helm/dbot/values.yaml -n default --recreate-pods  --set discord_token=${{secrets.DISCORD_TOKEN}} --set
+
+
