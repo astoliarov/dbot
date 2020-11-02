@@ -174,3 +174,4 @@ volumes/
 nohup.out
 app/channel_config/config.json
 app/config/local.py
+helm/dbot/config.json
