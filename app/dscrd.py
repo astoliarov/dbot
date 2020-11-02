@@ -15,6 +15,10 @@ class DiscordClient(discord.Client):
         *args,
         **kwargs
     ):
+
+        intents = discord.Intents.all()
+        kwargs["intents"] = intents
+
         super().__init__(*args, **kwargs)
 
         self.processing_service = processing_service

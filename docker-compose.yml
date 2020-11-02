@@ -3,10 +3,8 @@ services:
   dbot:
     build: ./app
     command: python main.py
-    environment:
-      DBOT_DISCORD_TOKEN: "NzQwMDk2Mzk2MzUwMTkzNzA0.XykCew.sViApzplL772x-kTHpWbAwSXrdU"
-      DBOT_REDIS_URL: "redis://redis"
-      DBOT_ENV_CONFIG: "true"
+    env_file:
+      - ./values/local.env
   redis:
     image: "redis:alpine"
     ports:

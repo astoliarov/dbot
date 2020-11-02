@@ -4,7 +4,13 @@ import logging
 import typing
 
 from dao import ChannelInfo, ChannelInfoDAO
-from models import ChannelActivityNotification, ChannelConfig, Notification, User, UserActivityInfo
+from models import (
+    ChannelActivityNotification,
+    ChannelConfig,
+    Notification,
+    User,
+    UserActivityInfo,
+)
 from sender import CallbackService
 
 logger = logging.getLogger("debug")
