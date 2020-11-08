@@ -8,9 +8,7 @@ def test__ConfigSchema__channel_config_loaded__channel_id_parsed_correctly():
         "channels": [
             {
                 "channel_id": 132132131,
-                "postbacks": [
-                    "http://0.0.0.0:8000/?id={{user_id}}&username={{username}}"
-                ],
+                "postbacks": ["http://0.0.0.0:8000/?id={{user_id}}&username={{username}}"],
             }
         ],
     }
@@ -31,9 +29,7 @@ def test__ConfigSchema__channel_config_loaded__postback_parsed_correctly():
         "channels": [
             {
                 "channel_id": 740097329318854662,
-                "postbacks": [
-                    "http://0.0.0.0:8000/?id={{user_id}}&username={{username}}"
-                ],
+                "postbacks": ["http://0.0.0.0:8000/?id={{user_id}}&username={{username}}"],
             }
         ],
     }

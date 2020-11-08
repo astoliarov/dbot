@@ -5,9 +5,8 @@ from urllib.parse import quote_plus
 
 import aiohttp
 from jinja2 import Template
-from sentry_sdk import capture_exception
-
 from models import ChannelActivityNotification, ChannelConfig, Notification
+from sentry_sdk import capture_exception
 
 logger = logging.getLogger("debug")
 
@@ -16,27 +15,20 @@ class CallbackService:
     def __init__(self, channels_config: typing.List[ChannelConfig]):
         self.session = aiohttp.ClientSession()
         self.channels_templates = {
-            config.channel_id: self._init_channel_templates(config)
-            for config in channels_config
+            config.channel_id: self._init_channel_templates(config) for config in channels_config
         }
 
-    def _init_channel_templates(
-        self, channel_config: ChannelConfig
-    ) -> typing.Dict[str, typing.List[Template]]:
+    def _init_channel_templates(self, channel_config: ChannelConfig) -> typing.Dict[str, typing.List[Template]]:
         return {
             "user_activity_postbacks": [
-                Template(template_str)
-                for template_str in channel_config.user_activity_postbacks
+                Template(template_str) for template_str in channel_config.user_activity_postbacks
             ],
             "channel_activity_postbacks": [
-                Template(template_str)
-                for template_str in channel_config.channel_activity_postbacks
+                Template(template_str) for template_str in channel_config.channel_activity_postbacks
             ],
         }
 
-    async def send_user_activity_notification(
-        self, notification: Notification, channel_id: int
-    ) -> None:
+    async def send_user_activity_notification(self, notification: Notification, channel_id: int) -> None:
         data = {
             "username": notification.user.username,
             "id": notification.user.id,

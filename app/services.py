@@ -4,13 +4,7 @@ import logging
 import typing
 
 from dao import ChannelInfo, ChannelInfoDAO
-from models import (
-    ChannelActivityNotification,
-    ChannelConfig,
-    Notification,
-    User,
-    UserActivityInfo,
-)
+from models import ChannelActivityNotification, ChannelConfig, Notification, User, UserActivityInfo
 from sender import CallbackService
 
 logger = logging.getLogger("debug")
@@ -43,9 +37,7 @@ class ActivityProcessingService:
 
             logger.debug(f"{channel.channel_id}: users: {users}")
             activities = []
-            channel_info = await self.channel_info_dao.get_channel_info(
-                channel_id=channel.channel_id
-            )
+            channel_info = await self.channel_info_dao.get_channel_info(channel_id=channel.channel_id)
             if channel_info is not None:
                 activities = channel_info.activities
 
@@ -53,25 +45,15 @@ class ActivityProcessingService:
 
             notifications = self._get_user_activity_notifications(users, activities)
             for notification in notifications:
-                await self.callback_service.send_user_activity_notification(
-                    notification, channel.channel_id
-                )
+                await self.callback_service.send_user_activity_notification(notification, channel.channel_id)
 
-            logger.debug(
-                f"{channel.channel_id}: user activity notifications - {notifications}"
-            )
+            logger.debug(f"{channel.channel_id}: user activity notifications - {notifications}")
 
-            channel_notification = self._get_channel_new_activity_notifications(
-                users, channel_info
-            )
+            channel_notification = self._get_channel_new_activity_notifications(users, channel_info)
             if channel_notification:
-                await self.callback_service.send_channel_activity_notification(
-                    channel_notification, channel.channel_id
-                )
+                await self.callback_service.send_channel_activity_notification(channel_notification, channel.channel_id)
 
-            logger.debug(
-                f"{channel.channel_id}: channel activity - {channel_notification} "
-            )
+            logger.debug(f"{channel.channel_id}: channel activity - {channel_notification} ")
 
             activities = self._get_current_user_activity_info(users)
             new_channel_info = ChannelInfo(
@@ -80,20 +62,14 @@ class ActivityProcessingService:
                 activities=activities,
             )
 
-            await self.channel_info_dao.write_channel_info(
-                channel_info=new_channel_info
-            )
+            await self.channel_info_dao.write_channel_info(channel_info=new_channel_info)
 
-    def _get_current_user_activity_info(
-        self, users: typing.List[User]
-    ) -> typing.List[UserActivityInfo]:
+    def _get_current_user_activity_info(self, users: typing.List[User]) -> typing.List[UserActivityInfo]:
         fresh_activities = []
         processing_timestamp = self._get_processing_timestamp()
 
         for user in users:
-            fresh_activities.append(
-                UserActivityInfo(id=user.id, last_seen_timestamp=processing_timestamp)
-            )
+            fresh_activities.append(UserActivityInfo(id=user.id, last_seen_timestamp=processing_timestamp))
 
         return fresh_activities
 
@@ -114,9 +90,7 @@ class ActivityProcessingService:
 
             # activity outdated
             activity = activity_by_id[user_id]
-            if (
-                processing_timestamp - activity.last_seen_timestamp
-            ) > self.ACTIVITY_LIFETIME:
+            if (processing_timestamp - activity.last_seen_timestamp) > self.ACTIVITY_LIFETIME:
                 notifications.append(Notification(user=user))
                 continue
 
@@ -132,15 +106,11 @@ class ActivityProcessingService:
 
         processing_timestamp = self._get_processing_timestamp()
 
-        if (
-            processing_timestamp - channel_info.timestamp
-        ) > self.CHANNEL_ACTIVITY_LIFETIME:
+        if (processing_timestamp - channel_info.timestamp) > self.CHANNEL_ACTIVITY_LIFETIME:
             return None
 
         if not channel_info.activities and users:
-            return ChannelActivityNotification(
-                channel_id=channel_info.channel_id, users=users
-            )
+            return ChannelActivityNotification(channel_id=channel_info.channel_id, users=users)
 
         return None
 
