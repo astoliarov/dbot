@@ -33,8 +33,3 @@ if __name__ == "__main__":
     client = dscrd.DiscordClient(processing_service, loop=loop, check_interval=10)
 
     client.run(config.DISCORD_TOKEN)
-
-    @client.event
-    async def on_error(event, *args, **kwargs):
-        """Don't ignore the error, causing Sentry to capture it."""
-        raise

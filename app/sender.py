@@ -1,10 +1,15 @@
 # coding: utf-8
+import logging
 import typing
 from urllib.parse import quote_plus
 
 import aiohttp
 from jinja2 import Template
+from sentry_sdk import capture_exception
+
 from models import ChannelActivityNotification, ChannelConfig, Notification
+
+logger = logging.getLogger("debug")
 
 
 class CallbackService:
@@ -42,7 +47,7 @@ class CallbackService:
 
         for template in templates["user_activity_postbacks"]:
             link = template.render(**data)
-            await self.session.get(link, allow_redirects=True)
+            await self._make_call(link)
 
     async def send_channel_activity_notification(
         self, notification: ChannelActivityNotification, channel_id: int
@@ -60,4 +65,11 @@ class CallbackService:
 
         for template in templates["channel_activity_postbacks"]:
             link = template.render(**data)
+            await self._make_call(link)
+
+    async def _make_call(self, link: str) -> None:
+        try:
             await self.session.get(link, allow_redirects=True)
+        except Exception as e:
+            capture_exception(e)
+            logger.info(e)
