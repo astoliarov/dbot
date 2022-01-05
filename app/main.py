@@ -12,6 +12,7 @@ from services import ActivityProcessingService
 
 logger = logging.getLogger("debug")
 
+
 async def init(redis_url):
     redis = await aioredis.create_redis_pool(redis_url, timeout=10)
     return redis

@@ -11,7 +11,13 @@ logger = logging.getLogger("debug")
 
 
 class DiscordClient(discord.Client):
-    def __init__(self, processing_service: ActivityProcessingService, check_interval: int, *args, **kwargs):
+    def __init__(
+        self,
+        processing_service: ActivityProcessingService,
+        check_interval: int,
+        *args,
+        **kwargs
+    ):
 
         intents = discord.Intents.all()
         kwargs["intents"] = intents
