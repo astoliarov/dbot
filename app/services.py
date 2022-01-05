@@ -32,7 +32,6 @@ class ActivityProcessingService:
 
     async def process(self):
         logger.debug("start processing")
-        logger.debug(f"{self.channel_configs}")
         for channel in self.channel_configs:
             logger.debug(f"extracting users from {channel.channel_id}")
             users = self.discord_client.get_channel_members(channel.channel_id)
