@@ -1,10 +1,13 @@
 # coding: utf-8
 import asyncio
+import logging
 import typing
 
 import discord
 from models import User
 from services import ActivityProcessingService
+
+logger = logging.getLogger("debug")
 
 
 class DiscordClient(discord.Client):
@@ -29,6 +32,9 @@ class DiscordClient(discord.Client):
 
     def get_channel_members(self, channel_id: int) -> typing.List[User]:
         channel = self.get_channel(channel_id)
+
+        if channel is None:
+            return []
 
         users = []
         for member in channel.members:

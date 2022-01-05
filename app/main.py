@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import aioredis
 import config
@@ -9,6 +10,7 @@ from dao import ChannelInfoDAO
 from sender import CallbackService
 from services import ActivityProcessingService
 
+logger = logging.getLogger("debug")
 
 async def init(redis_url):
     redis = await aioredis.create_redis_pool(redis_url, timeout=10)
@@ -21,6 +23,7 @@ if __name__ == "__main__":
 
     loader = JSONLoader()
     channel_config = loader.from_file(config.CHANNEL_CONFIG_PATH)
+    logger.debug(channel_config)
 
     loop = asyncio.get_event_loop()
 
