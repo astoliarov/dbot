@@ -1,10 +1,13 @@
 # coding: utf-8
 import asyncio
+import logging
 import typing
 
 import discord
 from models import User
 from services import ActivityProcessingService
+
+logger = logging.getLogger("debug")
 
 
 class DiscordClient(discord.Client):
@@ -24,11 +27,16 @@ class DiscordClient(discord.Client):
     async def my_background_task(self):
         await self.wait_until_ready()
         while not self.is_closed():
-            await self.processing_service.process()
+            try:
+                await self.processing_service.process()
+            except Exception as e:
+                logger.error(e)
             await asyncio.sleep(self.check_interval)  # task runs every 60 seconds
 
-    def get_channel_members(self, channel_id: int) -> typing.List[User]:
+    def get_channel_members(self, channel_id: int) -> typing.Optional[typing.List[User]]:
         channel = self.get_channel(channel_id)
+        if channel is None:
+            return None
 
         users = []
         for member in channel.members:
