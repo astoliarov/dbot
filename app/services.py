@@ -5,13 +5,13 @@ import typing
 
 from dao import ChannelInfo, ChannelInfoDAO
 from models import ChannelActivityNotification, ChannelConfig, Notification, User, UserActivityInfo
+from monitoring import HealthChecksIOMonitoring
 from sender import CallbackService
 
 logger = logging.getLogger("debug")
 
 
 class ActivityProcessingService:
-
     ACTIVITY_LIFETIME = 60 * 60  # 1 hour
     CHANNEL_ACTIVITY_LIFETIME = 60 * 60
 
@@ -20,18 +20,24 @@ class ActivityProcessingService:
         channel_info_dao: ChannelInfoDAO,
         callback_service: CallbackService,
         channel_configs: typing.List[ChannelConfig],
+        monitoring: typing.Optional[HealthChecksIOMonitoring],
     ) -> None:
 
         self.discord_client = None
         self.channel_info_dao = channel_info_dao
         self.callback_service = callback_service
         self.channel_configs = channel_configs
+        self.monitoring = monitoring
 
     def register_client(self, discord_client):
         self.discord_client = discord_client
 
+    async def on_proces_finish(self):
+        if self.monitoring:
+            await self.monitoring.on_job_executed_successfully()
+
     async def process(self):
-        logger.debug("start processing")
+        logger.info("start processing")
         for channel in self.channel_configs:
             logger.debug(f"extracting users from {channel.channel_id}")
             users = self.discord_client.get_channel_members(channel.channel_id)
@@ -67,6 +73,8 @@ class ActivityProcessingService:
             )
 
             await self.channel_info_dao.write_channel_info(channel_info=new_channel_info)
+
+        await self.on_proces_finish()
 
     def _get_current_user_activity_info(self, users: typing.List[User]) -> typing.List[UserActivityInfo]:
         fresh_activities = []
