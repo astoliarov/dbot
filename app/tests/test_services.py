@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-
 from models import ChannelInfo, User, UserActivityInfo
 from services import ActivityProcessingService
 
