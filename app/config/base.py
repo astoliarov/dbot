@@ -9,6 +9,8 @@ CHANNEL_CONFIG_PATH = "./channel_config/config.json"
 DISCORD_TOKEN = ""
 SENTRY_DSN = ""
 
+HEALTHCHECKSIO_WEBHOOK = ""
+
 config = {
     "version": 1,
     "formatters": {

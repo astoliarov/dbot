@@ -10,11 +10,13 @@ def service(mocker):
     channel_info_dao_mock = mocker.MagicMock()
     callback_service_mock = mocker.MagicMock()
     channel_configs_mock = mocker.MagicMock()
+    monitoring_mock = mocker.MagicMock()
 
     service = ActivityProcessingService(
         channel_info_dao=channel_info_dao_mock,
         callback_service=callback_service_mock,
         channel_configs=channel_configs_mock,
+        monitoring=monitoring_mock,
     )
 
     return service
