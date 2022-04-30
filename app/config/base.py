@@ -25,7 +25,7 @@ config = {
     },
     "loggers": {
         "debug": {
-            "level": "DEBUG",
+            "level": "INFO",
             "handlers": [
                 "console",
             ],

@@ -28,3 +28,8 @@ lint: lint-black lint-isort
 .PHONY: test
 test:
 	cd app/ && python -m pytest tests/ -vv
+
+.PHONY: fmt
+fmt:
+	black -l 120 app/
+	isort --recursive app/

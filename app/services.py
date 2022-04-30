@@ -35,6 +35,9 @@ class ActivityProcessingService:
         for channel in self.channel_configs:
             logger.debug(f"extracting users from {channel.channel_id}")
             users = self.discord_client.get_channel_members(channel.channel_id)
+            if users is None:
+                logger.debug(f"Cannot read {channel.channel_id}")
+                continue
 
             logger.debug(f"{channel.channel_id}: users: {users}")
             activities = []

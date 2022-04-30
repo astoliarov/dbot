@@ -1,10 +1,10 @@
 version: "3.2"
 services:
   dbot:
-    build: ./app
+    image: "bghji/dbot:latest"
     command: python main.py
     env_file:
-      - ./values/prod.env
+      - ./values/local.env
   redis:
     image: "redis:alpine"
     ports:
