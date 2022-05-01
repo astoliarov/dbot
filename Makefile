@@ -16,20 +16,20 @@ fixstyle: black isort
 
 .PHONY: lint-isort
 lint-isort:
-	cd app/ && poetry run isort --check-only --diff .
+	isort --check-only --diff .
 
 .PHONY: lint-black
 lint-black:
-	cd app/ && poetry run black -l 120 --check --diff .
+	black -l 120 --check --diff .
 
 .PHONY: lint
 lint: lint-black lint-isort
 
 .PHONY: test
 test:
-	cd app/ && poetry run python -m pytest tests/ -vv
+	cd app/ && python -m pytest tests/ -vv
 
 .PHONY: fmt
 fmt:
-	cd app/ && poetry run black -l 120 .
-	cd app/ && poetry run isort .
+	black -l 120 ./app
+	isort ./app
