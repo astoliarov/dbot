@@ -2,9 +2,14 @@ FROM python:3.9
 
 RUN mkdir /app
 WORKDIR /app
-COPY requirements.txt /app/requirements.txt
+
+RUN pip install poetry
 RUN apt update && apt install --yes libsodium-dev
-RUN SODIUM_INSTALL=system pip install --no-cache-dir -r requirements.txt
+
+COPY poetry.lock pyproject.toml ./
+RUN SODIUM_INSTALL=system poetry config virtualenvs.create false \
+  && poetry install --no-dev --no-interaction --no-ansi
+
 
 COPY . /app
 
