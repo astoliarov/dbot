@@ -15,7 +15,7 @@ logger = logging.getLogger("debug")
 
 
 async def init(redis_url):
-    redis = await aioredis.create_redis_pool(redis_url, timeout=10)
+    redis = await aioredis.from_url(redis_url, socket_timeout=10)
     return redis
 
 

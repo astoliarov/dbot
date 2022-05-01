@@ -16,11 +16,11 @@ fixstyle: black isort
 
 .PHONY: lint-isort
 lint-isort:
-	isort --check-only --diff --recursive app/
+	isort --check-only --diff .
 
 .PHONY: lint-black
 lint-black:
-	black -l 120 --check --diff app/
+	black -l 120 --check --diff .
 
 .PHONY: lint
 lint: lint-black lint-isort
@@ -31,5 +31,5 @@ test:
 
 .PHONY: fmt
 fmt:
-	black -l 120 app/
-	isort --recursive app/
+	black -l 120 ./app
+	isort ./app
