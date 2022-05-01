@@ -16,7 +16,7 @@ jobs:
           architecture: 'x64'
 
       - name: Install poetry
-        run: pip instal poetry
+        run: pip install poetry
 
       - name: Install dependencies
         run: cd app && poetry install --dev
