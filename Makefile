@@ -27,7 +27,7 @@ lint: lint-black lint-isort
 
 .PHONY: test
 test:
-	cd app/ && python -m pytest tests/ -vv
+	cd app/ && poetry run python -m pytest tests/ -vv
 
 .PHONY: fmt
 fmt:
