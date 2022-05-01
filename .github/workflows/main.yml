@@ -19,7 +19,7 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: cd app && poetry install --dev
+        run: cd app && poetry install
 
       - name: return to root folder
         run: cd ..
