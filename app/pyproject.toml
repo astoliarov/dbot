@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "discord-activity-bot"
-version = "1.0.0"
+version = "1.1.0"
 description = ""
 authors = ["Alexei Stoliarov <alexei.stoliarov@gmail.com>"]
 license = "MIT"
@@ -13,6 +13,7 @@ marshmallow = "^3.15.0"
 Jinja2 = "^3.1.2"
 environs = "^9.5.0"
 sentry-sdk = "^1.5.10"
+pydantic = "^1.10.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

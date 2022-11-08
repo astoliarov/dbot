@@ -1,11 +1,13 @@
-version: "3.2"
+version: "3.9"
 services:
   dbot:
     build: ./app
     command: python main.py
     env_file:
       - ./values/local.env
+    profiles: ["app"]
   redis:
     image: "redis:alpine"
     ports:
       - "6379:6379"
+    profiles: ["infra"]
