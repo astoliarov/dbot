@@ -4,6 +4,7 @@ import aioredis
 import dscrd
 import sentry_sdk
 import structlog
+from aioredis import Redis
 from channel_config.loader import JSONLoader
 from config import config_instance
 from dao import ChannelInfoDAO
@@ -15,9 +16,8 @@ from services import ActivityProcessingService
 logger = structlog.getLogger()
 
 
-async def init(redis_url):
-    redis = await aioredis.from_url(redis_url, socket_timeout=10)
-    return redis
+async def init(redis_url: str) -> Redis:
+    return await aioredis.from_url(redis_url, socket_timeout=10)
 
 
 if __name__ == "__main__":
