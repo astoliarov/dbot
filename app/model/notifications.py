@@ -9,12 +9,17 @@ class Notification:
 
 
 @dataclass
-class UserNotification(Notification):
+class NewUserInChannelNotification(Notification):
     user: User
     channel_id: int
 
 
 @dataclass
-class ChannelActivityNotification(Notification):
+class UsersConnectedToChannelNotification(Notification):
     channel_id: int
     users: list[User]
+
+
+@dataclass
+class UsersLeftChannelNotification(Notification):
+    channel_id: int

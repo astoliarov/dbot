@@ -7,9 +7,9 @@ import structlog
 from aioredis import Redis
 from channel_config.loader import JSONLoader
 from config import config_instance
-from dao import ChannelInfoDAO
 from logs import initialize_logs
 from monitoring import HealthChecksIOMonitoring
+from repository import Repository
 from sender import CallbackService
 from services import ActivityProcessingService
 
@@ -33,17 +33,16 @@ if __name__ == "__main__":
 
     loader = JSONLoader()
     channel_config = loader.from_file(config_instance.channel_config_path)
-    logger.debug(channel_config)
 
     loop = asyncio.get_event_loop()
 
     redis = loop.run_until_complete(init(config_instance.redis_url))
-    dao = ChannelInfoDAO(redis)
+    repository = Repository(redis_client=redis)
 
     sender = CallbackService(channel_config.channels)
 
     processing_service = ActivityProcessingService(
-        dao,
+        repository,
         sender,
         channel_config.channels,
         healthchecks_io_monitoring,

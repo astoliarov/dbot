@@ -5,11 +5,9 @@ from urllib.parse import quote_plus
 import aiohttp
 import structlog
 from jinja2 import Template
-from model import ChannelActivityNotification, ChannelConfig, UserNotification
-
+from model import ChannelConfig, NewUserInChannelNotification, UsersConnectedToChannelNotification
+from model.notifications import Notification, UsersLeftChannelNotification
 from sentry_sdk import capture_exception
-
-from model.notifications import Notification
 
 logger = structlog.getLogger()
 
@@ -36,7 +34,7 @@ class CallbackService:
         raise NotImplementedError()
 
     @send.register
-    async def _(self, notification: UserNotification) -> None:
+    async def _(self, notification: NewUserInChannelNotification) -> None:
         data = {
             "username": notification.user.username,
             "id": notification.user.id,
@@ -50,7 +48,7 @@ class CallbackService:
             await self._make_call(link)
 
     @send.register
-    async def _(self, notification: ChannelActivityNotification) -> None:
+    async def _(self, notification: UsersConnectedToChannelNotification) -> None:
         usernames = [user.username for user in notification.users]
         usernames_safe = quote_plus(",".join(usernames))
 
@@ -65,6 +63,11 @@ class CallbackService:
         for template in templates["channel_activity_postbacks"]:
             link = template.render(**data)
             await self._make_call(link)
+
+    @send.register
+    async def _(self, notification: UsersLeftChannelNotification) -> None:
+        logger.debug("received notification", notification=notification)
+        ...
 
     async def _make_call(self, link: str) -> None:
         try:
