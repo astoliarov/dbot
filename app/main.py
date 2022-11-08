@@ -1,7 +1,8 @@
 import asyncio
-import logging
 
 import aioredis
+import structlog
+
 import dscrd
 import sentry_sdk
 from channel_config.loader import JSONLoader
@@ -12,7 +13,7 @@ from monitoring import HealthChecksIOMonitoring
 from sender import CallbackService
 from services import ActivityProcessingService
 
-logger = logging.getLogger("debug")
+logger = structlog.getLogger()
 
 
 async def init(redis_url):

@@ -1,4 +1,15 @@
+from enum import Enum
+
 from pydantic import BaseSettings
+
+
+class LogLevelEnum(Enum):
+    CRITICAL = 'CRITICAL'
+    FATAL = 'FATAL'
+    ERROR = 'ERROR'
+    WARNING = 'WARNING'
+    INFO = 'INFO'
+    DEBUG = 'DEBUG'
 
 
 class Configuration(BaseSettings):
@@ -6,7 +17,7 @@ class Configuration(BaseSettings):
     redis_url: str
     channel_config_path: str = "./channel_config/config.json"
     sentry_dsn: str = ""
-    logging_level: str = "DEBUG"
+    logging_level: LogLevelEnum = LogLevelEnum.DEBUG
     healthcheckio_webhook: str = ""
 
     class Config:
