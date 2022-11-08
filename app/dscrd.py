@@ -33,7 +33,7 @@ class DiscordClient(discord.Client):
                 logger.error(e)
             await asyncio.sleep(self.check_interval)  # task runs every 60 seconds
 
-    def get_channel_members(self, channel_id: int) -> typing.Optional[typing.List[User]]:
+    def get_channel_members(self, channel_id: int) -> typing.Optional[list[User]]:
         channel = self.get_channel(channel_id)
         if channel is None:
             return None

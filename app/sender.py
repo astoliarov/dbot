@@ -11,13 +11,13 @@ logger = structlog.getLogger()
 
 
 class CallbackService:
-    def __init__(self, channels_config: typing.List[ChannelConfig]):
+    def __init__(self, channels_config: list[ChannelConfig]):
         self.session = aiohttp.ClientSession()
         self.channels_templates = {
             config.channel_id: self._init_channel_templates(config) for config in channels_config
         }
 
-    def _init_channel_templates(self, channel_config: ChannelConfig) -> typing.Dict[str, typing.List[Template]]:
+    def _init_channel_templates(self, channel_config: ChannelConfig) -> typing.Dict[str, list[Template]]:
         return {
             "user_activity_postbacks": [
                 Template(template_str) for template_str in channel_config.user_activity_postbacks
