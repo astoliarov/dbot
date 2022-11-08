@@ -18,7 +18,7 @@ class ActivityProcessingService:
         self,
         channel_info_dao: ChannelInfoDAO,
         callback_service: CallbackService,
-        channel_configs: typing.List[ChannelConfig],
+        channel_configs: list[ChannelConfig],
         monitoring: typing.Optional[HealthChecksIOMonitoring],
     ) -> None:
 
@@ -38,55 +38,55 @@ class ActivityProcessingService:
     async def process(self):
         logger.info("start processing")
         for channel in self.channel_configs:
-            logger.debug("extracting users", channel_id=channel.channel_id)
-            users = self.discord_client.get_channel_members(channel.channel_id)
-            if users is None:
-                logger.debug("cannot read channel", channel_id=channel.channel_id)
-                continue
-
-            logger.debug("users in channel", channel=channel.channel_id, users=users)
-            activities = []
-            channel_info = await self.channel_info_dao.get_channel_info(channel_id=channel.channel_id)
-            if channel_info is not None:
-                activities = channel_info.activities
-
-            logger.debug("info", channel_id=channel.channel_id, info=channel_info)
-
-            notifications = self._get_user_activity_notifications(users, activities)
-            for notification in notifications:
-                await self.callback_service.send_user_activity_notification(notification, channel.channel_id)
-
-            logger.debug("user activity notification", channel_id=channel.channel_id, notifications=notifications)
-
-            channel_notification = self._get_channel_new_activity_notifications(users, channel_info)
-            if channel_notification:
-                await self.callback_service.send_channel_activity_notification(channel_notification, channel.channel_id)
-
-            logger.debug("channel activity", channel_id=channel.channel_id, channel_notification=channel_notification)
-
-            activities = self._get_current_user_activity_info(users)
-            new_channel_info = ChannelInfo(
-                channel_id=channel.channel_id,
-                timestamp=int(datetime.datetime.now().timestamp()),
-                activities=activities,
-            )
-
-            await self.channel_info_dao.write_channel_info(channel_info=new_channel_info)
+            await self.process_channel(channel)
 
         await self.on_proces_finish()
 
-    def _get_current_user_activity_info(self, users: typing.List[User]) -> typing.List[UserActivityInfo]:
-        fresh_activities = []
-        processing_timestamp = self._get_processing_timestamp()
+    async def process_channel(self, channel: ChannelConfig) -> None:
+        logger.debug("extracting users", channel_id=channel.channel_id)
+        users = self.discord_client.get_channel_members(channel.channel_id)
+        if users is None:
+            logger.debug("cannot read channel", channel_id=channel.channel_id)
+            return
 
-        for user in users:
-            fresh_activities.append(UserActivityInfo(id=user.id, last_seen_timestamp=processing_timestamp))
+        logger.debug("users in channel", channel=channel.channel_id, users=users)
+        channel_info = await self.channel_info_dao.get_channel_info(channel_id=channel.channel_id)
 
-        return fresh_activities
+        logger.debug("info", channel_id=channel.channel_id, info=channel_info)
+
+        await self.process_notifications(channel_info=channel_info, users=users)
+
+        await self.update_activity(users=users, channel_id=channel.channel_id)
+
+    async def update_activity(self, users: list[User], channel_id: int) -> None:
+        activities = [
+            UserActivityInfo(id=user.id, last_seen_timestamp=self._get_processing_timestamp()) for user in users
+        ]
+        new_channel_info = ChannelInfo(
+            channel_id=channel_id,
+            timestamp=int(datetime.datetime.now().timestamp()),
+            activities=activities,
+        )
+        await self.channel_info_dao.write_channel_info(channel_info=new_channel_info)
+
+    async def process_notifications(self, users: list[User], channel_info: typing.Optional[ChannelInfo]) -> None:
+        activities = channel_info.activities if channel_info else []
+
+        notifications = self._get_user_activity_notifications(users, activities)
+        for notification in notifications:
+            await self.callback_service.send_user_activity_notification(notification, channel_info.channel_id)
+
+        logger.debug("user activity notification", channel_id=channel_info.channel_id, notifications=notifications)
+
+        channel_notification = self._get_channel_new_activity_notifications(users, channel_info)
+        if channel_notification:
+            await self.callback_service.send_channel_activity_notification(
+                channel_notification, channel_info.channel_id
+            )
 
     def _get_user_activity_notifications(
-        self, users: typing.List[User], activity_info: typing.List[UserActivityInfo]
-    ) -> typing.List[Notification]:
+        self, users: list[User], activity_info: list[UserActivityInfo]
+    ) -> list[Notification]:
         processing_timestamp = self._get_processing_timestamp()
         users_by_id = {user.id: user for user in users}
         activity_by_id = {activity.id: activity for activity in activity_info}
@@ -109,7 +109,7 @@ class ActivityProcessingService:
 
     def _get_channel_new_activity_notifications(
         self,
-        users: typing.List[User],
+        users: list[User],
         channel_info: typing.Optional[ChannelInfo],
     ) -> typing.Optional[ChannelActivityNotification]:
         if not channel_info:
