@@ -1,39 +1,56 @@
-# coding: utf-8
-
-from marshmallow import Schema, fields, post_load
-from models import ChannelConfig, ChannelsConfig
+from models import ChannelConfig, ChannelInfo, ChannelsConfig, UserActivityInfo
+from pydantic import BaseModel
 
 
-class UserActivityInfoSchema(Schema):
-    id = fields.Int()
-    last_seen_timestamp = fields.Int()
+class UserActivityInfoSerializer(BaseModel):
+    id: int
+    last_seen_timestamp: int
+
+    def to_model(self) -> UserActivityInfo:
+        return UserActivityInfo(id=self.id, last_seen_timestamp=self.last_seen_timestamp)
+
+    @classmethod
+    def from_model(cls, model: UserActivityInfo) -> "UserActivityInfoSerializer":
+        return cls(
+            id=model.id,
+            last_seen_timestamp=model.last_seen_timestamp,
+        )
 
 
-class ChannelInfoSchema(Schema):
-    channel_id = fields.Int()
-    timestamp = fields.Int()
-    activities = fields.List(fields.Nested(UserActivityInfoSchema))
+class ChannelInfoSerializer(BaseModel):
+    channel_id: int
+    timestamp: int
+    activities: list[UserActivityInfoSerializer]
+
+    def to_model(self) -> ChannelInfo:
+        return ChannelInfo(
+            channel_id=self.channel_id, timestamp=self.timestamp, activities=[i.to_model() for i in self.activities]
+        )
+
+    @classmethod
+    def from_model(cls, model: ChannelInfo) -> "ChannelInfoSerializer":
+        return cls(
+            channel_id=model.channel_id,
+            timestamp=model.timestamp,
+            activities=[UserActivityInfoSerializer.from_model(i) for i in model.activities],
+        )
 
 
-class ChannelConfigSchema(Schema):
-    channel_id = fields.Int()
-    user_activity_postbacks = fields.List(fields.Str())
-    channel_activity_postbacks = fields.List(fields.Str())
+class ChannelConfigSerializer(BaseModel):
+    channel_id: int
+    user_activity_postbacks: list[str]
+    channel_activity_postbacks: list[str]
 
-    @post_load
-    def load_channel_config(self, data, **kwargs):
-        if "channel_activity_postbacks" not in data:
-            data["channel_activity_postbacks"] = []
-
-        if "user_activity_postbacks" not in data:
-            data["user_activity_postbacks"] = []
-
-        return ChannelConfig(**data)
+    def to_model(self) -> ChannelConfig:
+        return ChannelConfig(
+            channel_id=self.channel_id,
+            user_activity_postbacks=self.user_activity_postbacks,
+            channel_activity_postbacks=self.channel_activity_postbacks,
+        )
 
 
-class ConfigSchema(Schema):
-    channels = fields.List(fields.Nested(ChannelConfigSchema))
+class ConfigSerializer(BaseModel):
+    channels: list[ChannelConfigSerializer]
 
-    @post_load
-    def load_config(self, data, **kwargs):
-        return ChannelsConfig(**data)
+    def to_model(self):
+        return ChannelsConfig(channels=[c.to_model() for c in self.channels])

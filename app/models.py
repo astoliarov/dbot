@@ -1,5 +1,3 @@
-# coding: utf-8
-import typing
 from dataclasses import dataclass
 
 
@@ -19,7 +17,7 @@ class UserActivityInfo:
 class ChannelInfo:
     channel_id: int
     timestamp: int
-    activities: typing.List[UserActivityInfo]
+    activities: list[UserActivityInfo]
 
 
 @dataclass
@@ -30,16 +28,16 @@ class Notification:
 @dataclass
 class ChannelActivityNotification:
     channel_id: int
-    users: typing.List[User]
+    users: list[User]
 
 
 @dataclass
 class ChannelConfig:
     channel_id: int
-    user_activity_postbacks: typing.List[str]
-    channel_activity_postbacks: typing.List[str]
+    user_activity_postbacks: list[str]
+    channel_activity_postbacks: list[str]
 
 
 @dataclass
 class ChannelsConfig:
-    channels: typing.List[ChannelConfig]
+    channels: list[ChannelConfig]

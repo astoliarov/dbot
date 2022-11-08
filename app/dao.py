@@ -1,17 +1,8 @@
-import dataclasses
-import json
 import typing
 
 import aioredis
-from models import ChannelInfo, UserActivityInfo
-from serializers import ChannelInfoSchema
-
-
-class RedisJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if dataclasses.is_dataclass(o):
-            return dataclasses.asdict(o)
-        return super().default(o)
+from models import ChannelInfo
+from serializers import ChannelInfoSerializer
 
 
 class ChannelInfoDAO:
@@ -24,11 +15,9 @@ class ChannelInfoDAO:
         return self.CHANNEL_KEY_PREFIX.format(channel_id=channel_id)
 
     async def write_channel_info(self, channel_info: ChannelInfo) -> None:
-        schema = ChannelInfoSchema()
-        serialized = schema.dumps(channel_info)
-
+        serializer = ChannelInfoSerializer.from_model(channel_info)
         key = self._prepare_channel_key(channel_info.channel_id)
-        await self.client.set(key, serialized)
+        await self.client.set(key, serializer.json())
 
     async def get_channel_info(self, channel_id: int) -> typing.Optional[ChannelInfo]:
         key = self._prepare_channel_key(channel_id)
@@ -36,13 +25,5 @@ class ChannelInfoDAO:
         if data is None:
             return None
 
-        schema = ChannelInfoSchema()
-
-        loaded = schema.loads(data)
-        activities = [UserActivityInfo(**activity) for activity in loaded["activities"]]
-
-        return ChannelInfo(
-            channel_id=loaded["channel_id"],
-            timestamp=loaded["timestamp"],
-            activities=activities,
-        )
+        serializer = ChannelInfoSerializer.parse_raw(data)
+        return serializer.to_model()
