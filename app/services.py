@@ -2,7 +2,6 @@ import datetime
 import typing
 
 import structlog
-
 from dao import ChannelInfo, ChannelInfoDAO
 from models import ChannelActivityNotification, ChannelConfig, Notification, User, UserActivityInfo
 from monitoring import HealthChecksIOMonitoring

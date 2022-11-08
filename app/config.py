@@ -4,12 +4,12 @@ from pydantic import BaseSettings
 
 
 class LogLevelEnum(Enum):
-    CRITICAL = 'CRITICAL'
-    FATAL = 'FATAL'
-    ERROR = 'ERROR'
-    WARNING = 'WARNING'
-    INFO = 'INFO'
-    DEBUG = 'DEBUG'
+    CRITICAL = "CRITICAL"
+    FATAL = "FATAL"
+    ERROR = "ERROR"
+    WARNING = "WARNING"
+    INFO = "INFO"
+    DEBUG = "DEBUG"
 
 
 class Configuration(BaseSettings):
