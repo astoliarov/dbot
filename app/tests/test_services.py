@@ -1,7 +1,7 @@
 import datetime
 
 import pytest
-from models import ChannelInfo, User, UserActivityInfo
+from model import ChannelInfo, User, UserActivityInfo
 from services import ActivityProcessingService
 
 
@@ -24,11 +24,12 @@ def service(mocker):
 
 def test__ActivityProcessingService_process_channel__no_activity_and_user__new_notification_for_user(mocker, service):
     user_1 = User(id=1, username="1")
+    channel_id = 1
     users = [user_1]
 
     activity = []
 
-    notifications = service._get_user_activity_notifications(users=users, activity_info=activity)
+    notifications = service._get_user_activity_notifications(users=users, activity_info=activity, channel_id=channel_id)
 
     assert len(notifications) == 1
     assert notifications[0].user == user_1
@@ -38,10 +39,11 @@ def test__ActivityProcessingService_process_channel__no_activities_and_users__ne
     mocker, service
 ):
     users = [User(id=1, username="1"), User(id=2, username="2")]
+    channel_id = 1
 
     activity = []
 
-    notifications = service._get_user_activity_notifications(users=users, activity_info=activity)
+    notifications = service._get_user_activity_notifications(users=users, activity_info=activity, channel_id=channel_id)
 
     assert len(notifications) == 2
 
@@ -50,12 +52,12 @@ def test__ActivityProcessingService_process_channel__fresh_activity_and_user__no
     users = [
         User(id=1, username="1"),
     ]
-
+    channel_id = 1
     dt = datetime.datetime.now()
 
     activity = [UserActivityInfo(id=1, last_seen_timestamp=int(dt.timestamp()))]
 
-    notifications = service._get_user_activity_notifications(users=users, activity_info=activity)
+    notifications = service._get_user_activity_notifications(users=users, activity_info=activity, channel_id=channel_id)
 
     assert len(notifications) == 0
 
@@ -63,12 +65,13 @@ def test__ActivityProcessingService_process_channel__fresh_activity_and_user__no
 def test__ActivityProcessingService_get_user_activity_notifications__outdated_activity_and_user__new_notification(
     mocker, service
 ):
+    channel_id = 1
     user_1 = User(id=1, username="1")
     users = [user_1]
     dt = datetime.datetime.now() - datetime.timedelta(minutes=service.ACTIVITY_LIFETIME + 5)
     activity = [UserActivityInfo(id=1, last_seen_timestamp=int(dt.timestamp()))]
 
-    notifications = service._get_user_activity_notifications(users=users, activity_info=activity)
+    notifications = service._get_user_activity_notifications(users=users, activity_info=activity, channel_id=channel_id)
 
     assert len(notifications) == 1
     assert notifications[0].user == user_1

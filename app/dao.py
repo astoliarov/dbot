@@ -1,7 +1,7 @@
 import typing
 
 import aioredis
-from models import ChannelInfo
+from model import ChannelInfo
 from serializers import ChannelInfoSerializer
 
 

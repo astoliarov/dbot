@@ -1,4 +1,4 @@
-from models import ChannelConfig, ChannelInfo, ChannelsConfig, UserActivityInfo
+from model import ChannelConfig, ChannelInfo, ChannelsConfig, UserActivityInfo
 from pydantic import BaseModel
 
 

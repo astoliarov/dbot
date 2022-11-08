@@ -3,7 +3,7 @@ import logging
 import typing
 
 import discord
-from models import User
+from model import User
 from services import ActivityProcessingService
 
 logger = logging.getLogger("debug")

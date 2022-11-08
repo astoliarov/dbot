@@ -26,3 +26,7 @@ fmt:
 .PHONY: local-deploy/infrastructure
 local-deploy/infrastructure:
 	docker compose --profile=infra up
+
+.PHONY: application/run-local
+application/run-local:
+	cd app/ && python ./main.py

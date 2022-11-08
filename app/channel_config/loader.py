@@ -1,4 +1,4 @@
-from models import ChannelsConfig
+from model import ChannelsConfig
 from serializers import ConfigSerializer
 
 
