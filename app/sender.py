@@ -1,14 +1,13 @@
-# coding: utf-8
-import logging
 import typing
 from urllib.parse import quote_plus
 
 import aiohttp
+import structlog
 from jinja2 import Template
 from models import ChannelActivityNotification, ChannelConfig, Notification
 from sentry_sdk import capture_exception
 
-logger = logging.getLogger("debug")
+logger = structlog.getLogger()
 
 
 class CallbackService:

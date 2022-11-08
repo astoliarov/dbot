@@ -1,14 +1,13 @@
-# coding: utf-8
 import datetime
-import logging
 import typing
 
+import structlog
 from dao import ChannelInfo, ChannelInfoDAO
 from models import ChannelActivityNotification, ChannelConfig, Notification, User, UserActivityInfo
 from monitoring import HealthChecksIOMonitoring
 from sender import CallbackService
 
-logger = logging.getLogger("debug")
+logger = structlog.getLogger()
 
 
 class ActivityProcessingService:
@@ -39,31 +38,31 @@ class ActivityProcessingService:
     async def process(self):
         logger.info("start processing")
         for channel in self.channel_configs:
-            logger.debug(f"extracting users from {channel.channel_id}")
+            logger.debug("extracting users", channel_id=channel.channel_id)
             users = self.discord_client.get_channel_members(channel.channel_id)
             if users is None:
-                logger.debug(f"Cannot read {channel.channel_id}")
+                logger.debug("cannot read channel", channel_id=channel.channel_id)
                 continue
 
-            logger.debug(f"{channel.channel_id}: users: {users}")
+            logger.debug("users in channel", channel=channel.channel_id, users=users)
             activities = []
             channel_info = await self.channel_info_dao.get_channel_info(channel_id=channel.channel_id)
             if channel_info is not None:
                 activities = channel_info.activities
 
-            logger.debug(f"{channel.channel_id}: info - {channel_info}")
+            logger.debug("info", channel_id=channel.channel_id, info=channel_info)
 
             notifications = self._get_user_activity_notifications(users, activities)
             for notification in notifications:
                 await self.callback_service.send_user_activity_notification(notification, channel.channel_id)
 
-            logger.debug(f"{channel.channel_id}: user activity notifications - {notifications}")
+            logger.debug("user activity notification", channel_id=channel.channel_id, notifications=notifications)
 
             channel_notification = self._get_channel_new_activity_notifications(users, channel_info)
             if channel_notification:
                 await self.callback_service.send_channel_activity_notification(channel_notification, channel.channel_id)
 
-            logger.debug(f"{channel.channel_id}: channel activity - {channel_notification} ")
+            logger.debug("channel activity", channel_id=channel.channel_id, channel_notification=channel_notification)
 
             activities = self._get_current_user_activity_info(users)
             new_channel_info = ChannelInfo(

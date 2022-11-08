@@ -3,17 +3,6 @@ install-helm-redis:
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm install redis-helm bitnami/redis --set usePassword=false --set cluster.enabled=false  --set master.persistence.enabled=false  --namespace=default
 
-.PHONY: black
-black:
-	black app/ -l 120
-
-.PHONY: isort
-isort:
-	isort --recursive app/
-
-.PHONY: fixstyle
-fixstyle: black isort
-
 .PHONY: lint-isort
 lint-isort:
 	isort --check-only --diff .
@@ -33,3 +22,7 @@ test:
 fmt:
 	black -l 120 ./app
 	isort ./app
+
+.PHONY: local-deploy/infrastructure
+local-deploy/infrastructure:
+	docker compose --profile=infra up
