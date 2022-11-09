@@ -9,7 +9,7 @@ lint-isort:
 
 .PHONY: lint-black
 lint-black:
-	black -l 120 --check --diff .
+	black --check --diff .
 
 .PHONY: lint
 lint: lint-black lint-isort
