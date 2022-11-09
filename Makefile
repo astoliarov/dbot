@@ -5,11 +5,11 @@ install-helm-redis:
 
 .PHONY: lint-isort
 lint-isort:
-	isort --check-only --diff .
+	isort --check-only --diff ./app
 
 .PHONY: lint-black
 lint-black:
-	black -l 120 --check --diff .
+	black --check --diff ./app
 
 .PHONY: lint
 lint: lint-black lint-isort
@@ -20,9 +20,13 @@ test:
 
 .PHONY: fmt
 fmt:
-	black -l 120 ./app
+	black ./app
 	isort ./app
 
 .PHONY: local-deploy/infrastructure
 local-deploy/infrastructure:
 	docker compose --profile=infra up
+
+.PHONY: application/run-local
+application/run-local:
+	cd app/ && python ./main.py

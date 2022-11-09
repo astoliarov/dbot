@@ -1,15 +1,17 @@
 import asyncio
-import logging
 import typing
 
 import discord
-from models import User
+import structlog
+
+from abstract import IDiscordClient
+from model import User
 from services import ActivityProcessingService
 
-logger = logging.getLogger("debug")
+logger = structlog.get_logger()
 
 
-class DiscordClient(discord.Client):
+class DiscordClient(discord.Client, IDiscordClient):
     def __init__(self, processing_service: ActivityProcessingService, check_interval: int, *args, **kwargs):
 
         intents = discord.Intents.all()
@@ -21,10 +23,10 @@ class DiscordClient(discord.Client):
         self.processing_service.register_client(self)
         self.check_interval = check_interval
 
-        self.bg_task = self.loop.create_task(self.my_background_task())
+        self.bg_task = self.loop.create_task(self.background_worker())
 
-    async def my_background_task(self):
-        logger.info("Starting background task")
+    async def background_worker(self):
+        logger.info("starting background task")
         await self.wait_until_ready()
         while not self.is_closed():
             try:
@@ -38,11 +40,4 @@ class DiscordClient(discord.Client):
         if channel is None:
             return None
 
-        if channel is None:
-            return []
-
-        users = []
-        for member in channel.members:
-            users.append(User(id=member.id, username=member.name))
-
-        return users
+        return [User(id=member.id, username=member.name) for member in channel.members]

@@ -1,11 +1,18 @@
 import typing
+from functools import singledispatchmethod
 from urllib.parse import quote_plus
 
 import aiohttp
 import structlog
 from jinja2 import Template
-from models import ChannelActivityNotification, ChannelConfig, Notification
 from sentry_sdk import capture_exception
+
+from model import (
+    ChannelConfig,
+    NewUserInChannelNotification,
+    UsersConnectedToChannelNotification,
+)
+from model.notifications import Notification, UsersLeftChannelNotification
 
 logger = structlog.getLogger()
 
@@ -27,12 +34,17 @@ class CallbackService:
             ],
         }
 
-    async def send_user_activity_notification(self, notification: Notification, channel_id: int) -> None:
+    @singledispatchmethod
+    async def send(self, notification: Notification) -> None:
+        raise NotImplementedError()
+
+    @send.register
+    async def _(self, notification: NewUserInChannelNotification) -> None:
         data = {
             "username": notification.user.username,
             "id": notification.user.id,
         }
-        templates = self.channels_templates.get(channel_id)
+        templates = self.channels_templates.get(notification.channel_id)
         if not templates:
             return
 
@@ -40,9 +52,8 @@ class CallbackService:
             link = template.render(**data)
             await self._make_call(link)
 
-    async def send_channel_activity_notification(
-        self, notification: ChannelActivityNotification, channel_id: int
-    ) -> None:
+    @send.register
+    async def _(self, notification: UsersConnectedToChannelNotification) -> None:
         usernames = [user.username for user in notification.users]
         usernames_safe = quote_plus(",".join(usernames))
 
@@ -50,13 +61,18 @@ class CallbackService:
             "usernames_safe": usernames_safe,
             "id": notification.channel_id,
         }
-        templates = self.channels_templates.get(channel_id)
+        templates = self.channels_templates.get(notification.channel_id)
         if not templates:
             return
 
         for template in templates["channel_activity_postbacks"]:
             link = template.render(**data)
             await self._make_call(link)
+
+    @send.register
+    async def _(self, notification: UsersLeftChannelNotification) -> None:
+        logger.debug("received notification", notification=notification)
+        ...
 
     async def _make_call(self, link: str) -> None:
         try:
