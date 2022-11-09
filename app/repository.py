@@ -82,7 +82,7 @@ class Repository:
             return None
 
         state = ChannelState.parse_raw(data)
-        if int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp()) - state.ts > self.STATE_LIFETIME:
+        if _get_timestamp() - state.ts > self.STATE_LIFETIME:
             logger.debug("previous state outdated", channel_id=channel_id)
             return None
 
