@@ -3,6 +3,7 @@ import typing
 
 import discord
 import structlog
+
 from abstract import IDiscordClient
 from model import User
 from services import ActivityProcessingService

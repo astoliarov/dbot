@@ -1,10 +1,11 @@
 import asyncio
 
 import aioredis
-import dscrd
 import sentry_sdk
 import structlog
 from aioredis import Redis
+
+import dscrd
 from channel_config.loader import JSONLoader
 from config import config_instance
 from logs import initialize_logs

@@ -1,6 +1,9 @@
 from model.config import ChannelConfig, ChannelsConfig
-from model.notifications import (NewUserInChannelNotification, UsersConnectedToChannelNotification,
-                                 UsersLeftChannelNotification)
+from model.notifications import (
+    NewUserInChannelNotification,
+    UsersConnectedToChannelNotification,
+    UsersLeftChannelNotification,
+)
 from model.user import ChannelInfo, User, UserActivityInfo
 
 __all__ = (

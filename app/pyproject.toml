@@ -8,7 +8,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.8"
 aioredis = "^2.0.1"
-"discord.py" = {extras = ["voice"], version = "^1.7.3"}
+"discord.py" = { extras = ["voice"], version = "^1.7.3" }
 Jinja2 = "^3.1.2"
 environs = "^9.5.0"
 sentry-sdk = "^1.5.10"
@@ -25,3 +25,10 @@ isort = "^5.10.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+combine_as_imports = true
+profile = "black"
+
+[tool.black]
+line-length = 120

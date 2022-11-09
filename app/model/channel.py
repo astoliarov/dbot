@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from model.notifications import (NewUserInChannelNotification, Notification, UsersConnectedToChannelNotification,
-                                 UsersLeftChannelNotification)
+from model.notifications import (
+    NewUserInChannelNotification,
+    Notification,
+    UsersConnectedToChannelNotification,
+    UsersLeftChannelNotification,
+)
 from model.user import User
 
 

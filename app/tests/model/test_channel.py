@@ -1,4 +1,9 @@
-from model import NewUserInChannelNotification, User, UsersConnectedToChannelNotification, UsersLeftChannelNotification
+from model import (
+    NewUserInChannelNotification,
+    User,
+    UsersConnectedToChannelNotification,
+    UsersLeftChannelNotification,
+)
 from model.channel import Channel
 
 
@@ -26,7 +31,9 @@ class TestCaseChannel:
             UsersConnectedToChannelNotification(users=channel.users, channel_id=channel.id),
         ]
 
-    def test__generate_notifications__new_user_connected_to_channel_with_users__notifications_correct(self):
+    def test__generate_notifications__new_user_connected_to_channel_with_users__notifications_correct(
+        self,
+    ):
         user = User(username="test", id=1)
         user_2 = User(username="test_2", id=2)
 

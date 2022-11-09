@@ -1,6 +1,7 @@
 import logging
 
 import structlog
+
 from config import LogLevelEnum
 
 name_to_level = {

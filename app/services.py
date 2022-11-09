@@ -1,6 +1,7 @@
 import typing
 
 import structlog
+
 from model import ChannelConfig
 from monitoring import HealthChecksIOMonitoring
 from repository import Repository

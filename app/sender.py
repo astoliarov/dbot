@@ -5,9 +5,14 @@ from urllib.parse import quote_plus
 import aiohttp
 import structlog
 from jinja2 import Template
-from model import ChannelConfig, NewUserInChannelNotification, UsersConnectedToChannelNotification
-from model.notifications import Notification, UsersLeftChannelNotification
 from sentry_sdk import capture_exception
+
+from model import (
+    ChannelConfig,
+    NewUserInChannelNotification,
+    UsersConnectedToChannelNotification,
+)
+from model.notifications import Notification, UsersLeftChannelNotification
 
 logger = structlog.getLogger()
 

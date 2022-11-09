@@ -1,6 +1,7 @@
 import structlog
-from model import ChannelConfig, ChannelsConfig
 from pydantic import BaseModel
+
+from model import ChannelConfig, ChannelsConfig
 
 logger = structlog.get_logger()
 

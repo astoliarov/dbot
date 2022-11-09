@@ -20,8 +20,8 @@ test:
 
 .PHONY: fmt
 fmt:
-	black -l 120 ./app
-	isort  ./app -l 120
+	black ./app
+	isort ./app
 
 .PHONY: local-deploy/infrastructure
 local-deploy/infrastructure:

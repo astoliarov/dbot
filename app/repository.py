@@ -2,11 +2,12 @@ import datetime
 from typing import Optional
 
 import structlog
-from abstract import IDiscordClient
 from aioredis import Redis
+from pydantic import BaseModel
+
+from abstract import IDiscordClient
 from model import User
 from model.channel import Channel
-from pydantic import BaseModel
 
 logger = structlog.get_logger()
 
@@ -37,7 +38,11 @@ class ChannelState(BaseModel):
 
     @classmethod
     def from_model(cls, model: Channel) -> "ChannelState":
-        return cls(id=model.id, ts=_get_timestamp(), users=[UserState.from_model(user) for user in model.users])
+        return cls(
+            id=model.id,
+            ts=_get_timestamp(),
+            users=[UserState.from_model(user) for user in model.users],
+        )
 
 
 class Repository:

@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+
 from model import ChannelConfig
 from model.channel import Channel
 from model.notifications import Notification
@@ -31,7 +32,10 @@ def callback_service():
 @pytest.fixture
 def service(repository, callback_service, monitoring):
     return ActivityProcessingService(
-        repository=repository, callback_service=callback_service, channel_configs=[], monitoring=monitoring
+        repository=repository,
+        callback_service=callback_service,
+        channel_configs=[],
+        monitoring=monitoring,
     )
 
 
