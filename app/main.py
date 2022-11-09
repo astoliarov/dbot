@@ -28,7 +28,7 @@ if __name__ == "__main__":
         sentry_sdk.init(config_instance.sentry_dsn)
 
     if config_instance.healthcheckio_webhook:
-        healthchecks_io_monitoring = HealthChecksIOMonitoring(webhook=config_instance.healthcheckio_webhook)
+        healthchecks_io_monitoring = HealthChecksIOMonitoring(webhook=config_instance.healthchecksio_webhook)
     else:
         healthchecks_io_monitoring = None
 
