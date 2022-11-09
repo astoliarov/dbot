@@ -29,9 +29,7 @@ class Channel:
         for user_id, user in new_users.items():
             old_user = old_users.get(user_id)
             if not old_user:
-                continue
-
-            notifications.append(NewUserInChannelNotification(user=user, channel_id=self.id))
+                notifications.append(NewUserInChannelNotification(user=user, channel_id=self.id))
 
         return notifications
 
