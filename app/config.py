@@ -18,7 +18,7 @@ class Configuration(BaseSettings):
     channel_config_path: str = "./channel_config/config.json"
     sentry_dsn: str = ""
     logging_level: LogLevelEnum = LogLevelEnum.DEBUG
-    healthcheckio_webhook: str = ""
+    healthchecksio_webhook: str = ""
 
     class Config:
         env_prefix = "dbot_"
