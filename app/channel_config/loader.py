@@ -11,15 +11,15 @@ logger = structlog.get_logger()
 class ChannelConfigSerializer(BaseModel):
     channel_id: int
     new_user_webhooks: list[str]
-    users_connected_webhook: list[str]
-    users_leave_webhook: Optional[list[str]]
+    users_connected_webhooks: list[str]
+    users_leave_webhooks: Optional[list[str]]
 
     def to_model(self) -> ChannelConfig:
         return ChannelConfig(
             channel_id=self.channel_id,
             new_user_webhooks=self.new_user_webhooks,
-            users_connected_webhook=self.users_connected_webhook,
-            users_leave_webhook=self.users_leave_webhook or [],
+            users_connected_webhooks=self.users_connected_webhooks,
+            users_leave_webhooks=self.users_leave_webhooks or [],
         )
 
 

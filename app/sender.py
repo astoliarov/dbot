@@ -34,10 +34,10 @@ class CallbackService:
     def _init_channel_templates(self, channel_config: ChannelConfig) -> typing.Dict[str, list[Template]]:
         return {
             "new_user_webhooks": [Template(template_str) for template_str in channel_config.new_user_webhooks],
-            "users_connected_webhook": [
-                Template(template_str) for template_str in channel_config.users_connected_webhook
+            "users_connected_webhooks": [
+                Template(template_str) for template_str in channel_config.users_connected_webhooks
             ],
-            "users_leave_webhook": [Template(template_str) for template_str in channel_config.users_leave_webhook],
+            "users_leave_webhooks": [Template(template_str) for template_str in channel_config.users_leave_webhooks],
         }
 
     @singledispatchmethod
@@ -73,7 +73,7 @@ class CallbackService:
         if not templates:
             return
 
-        for template in templates["users_connected_webhook"]:
+        for template in templates["users_connected_webhooks"]:
             link = template.render(**data)
             await self._make_call(link)
 
@@ -88,7 +88,7 @@ class CallbackService:
         if not templates:
             return
 
-        for template in templates["users_leave_webhook"]:
+        for template in templates["users_leave_webhooks"]:
             link = template.render(**data)
             await self._make_call(link)
 
