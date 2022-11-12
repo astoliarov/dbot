@@ -2,10 +2,10 @@ import typing
 
 import structlog
 
+from connectors.webhooks import WebhookService
 from model import ChannelConfig
 from monitoring import HealthChecksIOMonitoring
 from repository import Repository
-from sender import CallbackService
 
 logger = structlog.getLogger()
 
@@ -14,13 +14,13 @@ class ActivityProcessingService:
     def __init__(
         self,
         repository: Repository,
-        callback_service: CallbackService,
+        webhooks_service: WebhookService,
         channel_configs: list[ChannelConfig],
         monitoring: typing.Optional[HealthChecksIOMonitoring],
     ) -> None:
 
         self.repository = repository
-        self.callback_service = callback_service
+        self.webhooks_service = webhooks_service
         self.channel_configs = channel_configs
         self.monitoring = monitoring
 
@@ -48,6 +48,6 @@ class ActivityProcessingService:
 
         notifications = channel.generate_notifications()
         for notification in notifications:
-            await self.callback_service.send(notification)
+            await self.webhooks_service.send(notification)
 
         await self.repository.save(channel)
