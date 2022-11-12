@@ -2,12 +2,12 @@ from unittest import mock
 
 import pytest
 
+from connectors.webhooks import WebhookService
 from model import ChannelConfig
 from model.channel import Channel
 from model.notifications import Notification
 from monitoring import HealthChecksIOMonitoring
 from repository import Repository
-from sender import CallbackService
 from services import ActivityProcessingService
 
 
@@ -22,25 +22,25 @@ def monitoring():
 
 
 @pytest.fixture
-def callback_service():
-    callback_service = mock.AsyncMock(spec=CallbackService)
-    callback_service.send = mock.AsyncMock()
+def webhooks_service():
+    webhooks_service = mock.AsyncMock(spec=WebhookService)
+    webhooks_service.send = mock.AsyncMock()
 
-    return callback_service
+    return webhooks_service
 
 
 @pytest.fixture
-def service(repository, callback_service, monitoring):
+def service(repository, webhooks_service, monitoring):
     return ActivityProcessingService(
         repository=repository,
-        callback_service=callback_service,
+        webhooks_service=webhooks_service,
         channel_configs=[],
         monitoring=monitoring,
     )
 
 
 class TestCaseService:
-    async def test__process__no_errors__notification_send(self, service, repository, callback_service):
+    async def test__process__no_errors__notification_send(self, service, repository, webhooks_service):
         configs = [
             ChannelConfig(channel_id=1, new_user_webhooks=[], users_leave_webhooks=[], users_connected_webhooks=[])
         ]
@@ -54,4 +54,4 @@ class TestCaseService:
 
         await service.process()
 
-        callback_service.send.assert_called_once_with(notification)
+        webhooks_service.send.assert_called_once_with(notification)

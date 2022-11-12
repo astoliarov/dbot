@@ -8,10 +8,10 @@ from aioredis import Redis
 import dscrd
 from channel_config.loader import JSONLoader
 from config import config_instance
+from connectors.webhooks import WebhookService
 from logs import initialize_logs
 from monitoring import HealthChecksIOMonitoring
 from repository import Repository
-from sender import CallbackService
 from services import ActivityProcessingService
 
 logger = structlog.getLogger()
@@ -40,11 +40,11 @@ if __name__ == "__main__":
     redis = loop.run_until_complete(init(config_instance.redis_url))
     repository = Repository(redis_client=redis)
 
-    sender = CallbackService(channel_config.channels)
+    webhooks_service = WebhookService(channel_config.channels)
 
     processing_service = ActivityProcessingService(
         repository,
-        sender,
+        webhooks_service,
         channel_config.channels,
         healthchecks_io_monitoring,
     )

@@ -17,6 +17,7 @@ structlog = "^22.1.0"
 pytest-asyncio = "^0.20.1"
 isort = "^5.10.1"
 black = "^22.10.0"
+tenacity = "^8.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

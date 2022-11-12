@@ -3,11 +3,10 @@ from enum import Enum
 from functools import singledispatchmethod
 from urllib.parse import quote_plus
 
-import aiohttp
 import structlog
 from jinja2 import Template
-from sentry_sdk import capture_exception
 
+from connectors.transport import WebhooksTransport
 from model import (
     ChannelConfig,
     NewUserInChannelNotification,
@@ -24,9 +23,9 @@ class NotificationTypesEnum(Enum):
     USERS_LEAVE = "users_leave"
 
 
-class CallbackService:
+class WebhookService:
     def __init__(self, channels_config: list[ChannelConfig]):
-        self.session = aiohttp.ClientSession()
+        self.transport = WebhooksTransport()
         self.channels_templates = {
             config.channel_id: self._init_channel_templates(config) for config in channels_config
         }
@@ -57,7 +56,7 @@ class CallbackService:
 
         for template in templates["new_user_webhooks"]:
             link = template.render(**data)
-            await self._make_call(link)
+            await self.transport.call(link)
 
     @send.register
     async def _(self, notification: UsersConnectedToChannelNotification) -> None:
@@ -75,7 +74,7 @@ class CallbackService:
 
         for template in templates["users_connected_webhooks"]:
             link = template.render(**data)
-            await self._make_call(link)
+            await self.transport.call(link)
 
     @send.register
     async def _(self, notification: UsersLeftChannelNotification) -> None:
@@ -90,11 +89,4 @@ class CallbackService:
 
         for template in templates["users_leave_webhooks"]:
             link = template.render(**data)
-            await self._make_call(link)
-
-    async def _make_call(self, link: str) -> None:
-        try:
-            await self.session.get(link, allow_redirects=True)
-        except Exception as e:
-            capture_exception(e)
-            logger.info(e)
+            await self.transport.call(link)
