@@ -4,8 +4,9 @@ from dataclasses import dataclass
 @dataclass
 class ChannelConfig:
     channel_id: int
-    user_activity_postbacks: list[str]
-    channel_activity_postbacks: list[str]
+    new_user_webhooks: list[str]
+    users_connected_webhooks: list[str]
+    users_leave_webhooks: list[str]
 
 
 @dataclass

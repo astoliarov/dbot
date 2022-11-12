@@ -1,4 +1,5 @@
 import typing
+from enum import Enum
 from functools import singledispatchmethod
 from urllib.parse import quote_plus
 
@@ -17,6 +18,12 @@ from model.notifications import Notification, UsersLeftChannelNotification
 logger = structlog.getLogger()
 
 
+class NotificationTypesEnum(Enum):
+    NEW_USER = "new_user"
+    USERS_CONNECTED = "users_connected"
+    USERS_LEAVE = "users_leave"
+
+
 class CallbackService:
     def __init__(self, channels_config: list[ChannelConfig]):
         self.session = aiohttp.ClientSession()
@@ -26,12 +33,11 @@ class CallbackService:
 
     def _init_channel_templates(self, channel_config: ChannelConfig) -> typing.Dict[str, list[Template]]:
         return {
-            "user_activity_postbacks": [
-                Template(template_str) for template_str in channel_config.user_activity_postbacks
+            "new_user_webhooks": [Template(template_str) for template_str in channel_config.new_user_webhooks],
+            "users_connected_webhooks": [
+                Template(template_str) for template_str in channel_config.users_connected_webhooks
             ],
-            "channel_activity_postbacks": [
-                Template(template_str) for template_str in channel_config.channel_activity_postbacks
-            ],
+            "users_leave_webhooks": [Template(template_str) for template_str in channel_config.users_leave_webhooks],
         }
 
     @singledispatchmethod
@@ -43,12 +49,13 @@ class CallbackService:
         data = {
             "username": notification.user.username,
             "id": notification.user.id,
+            "type": NotificationTypesEnum.NEW_USER.value,
         }
         templates = self.channels_templates.get(notification.channel_id)
         if not templates:
             return
 
-        for template in templates["user_activity_postbacks"]:
+        for template in templates["new_user_webhooks"]:
             link = template.render(**data)
             await self._make_call(link)
 
@@ -60,19 +67,30 @@ class CallbackService:
         data = {
             "usernames_safe": usernames_safe,
             "id": notification.channel_id,
+            "type": NotificationTypesEnum.USERS_CONNECTED.value,
         }
         templates = self.channels_templates.get(notification.channel_id)
         if not templates:
             return
 
-        for template in templates["channel_activity_postbacks"]:
+        for template in templates["users_connected_webhooks"]:
             link = template.render(**data)
             await self._make_call(link)
 
     @send.register
     async def _(self, notification: UsersLeftChannelNotification) -> None:
-        logger.debug("received notification", notification=notification)
-        ...
+
+        data = {
+            "id": notification.channel_id,
+            "type": NotificationTypesEnum.USERS_LEAVE.value,
+        }
+        templates = self.channels_templates.get(notification.channel_id)
+        if not templates:
+            return
+
+        for template in templates["users_leave_webhooks"]:
+            link = template.render(**data)
+            await self._make_call(link)
 
     async def _make_call(self, link: str) -> None:
         try:

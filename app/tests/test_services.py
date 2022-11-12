@@ -41,7 +41,9 @@ def service(repository, callback_service, monitoring):
 
 class TestCaseService:
     async def test__process__no_errors__notification_send(self, service, repository, callback_service):
-        configs = [ChannelConfig(channel_id=1, user_activity_postbacks=[], channel_activity_postbacks=[])]
+        configs = [
+            ChannelConfig(channel_id=1, new_user_webhooks=[], users_leave_webhooks=[], users_connected_webhooks=[])
+        ]
         service.channel_configs = configs
 
         notification = Notification()
