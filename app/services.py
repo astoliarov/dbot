@@ -2,6 +2,7 @@ import typing
 
 import structlog
 
+from app.abstract import IDiscordClient
 from app.connectors.webhooks import WebhookService
 from app.model import ChannelConfig
 from app.monitoring import HealthChecksIOMonitoring
@@ -24,14 +25,14 @@ class ActivityProcessingService:
         self.channel_configs = channel_configs
         self.monitoring = monitoring
 
-    def register_client(self, discord_client):
+    def register_client(self, discord_client: IDiscordClient) -> None:
         self.repository.set_discord_client(discord_client)
 
-    async def on_proces_finish(self):
+    async def on_proces_finish(self) -> None:
         if self.monitoring:
             await self.monitoring.on_job_executed_successfully()
 
-    async def process(self):
+    async def process(self) -> None:
         logger.info("starting channels processing")
         for channel in self.channel_configs:
             await self._process_chanel(channel)

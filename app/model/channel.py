@@ -22,7 +22,7 @@ class Channel:
         return notifications
 
     def _get_user_notifications(self) -> list[Notification]:
-        notifications = []
+        notifications: list[Notification] = []
 
         if self.previous_state is None:
             return []
@@ -38,7 +38,7 @@ class Channel:
         return notifications
 
     def _get_chanel_notifications(self) -> list[Notification]:
-        notifications = []
+        notifications: list[Notification] = []
 
         if self.previous_state is None:
             return []

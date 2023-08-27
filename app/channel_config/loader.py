@@ -25,7 +25,7 @@ class ChannelConfigSerializer(BaseModel):
 class ConfigSerializer(BaseModel):
     channels: list[ChannelConfigSerializer]
 
-    def to_model(self):
+    def to_model(self) -> ChannelsConfig:
         return ChannelsConfig(channels=[c.to_model() for c in self.channels])
 
 

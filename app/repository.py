@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Any, Optional
 
 import redis
 import structlog
@@ -13,7 +13,7 @@ logger = structlog.get_logger()
 
 
 async def open_redis(redis_url: str) -> redis.Redis:
-    return redis.asyncio.from_url(redis_url, socket_timeout=10)
+    return redis.asyncio.from_url(redis_url, socket_timeout=10)  # type: ignore
 
 
 def _get_timestamp() -> int:
@@ -92,5 +92,5 @@ class Repository:
 
         return state.to_model()
 
-    def _prepare_channel_key(self, channel_id) -> str:
+    def _prepare_channel_key(self, channel_id: Any) -> str:
         return self.CHANNEL_KEY_PREFIX.format(channel_id=channel_id)

@@ -18,7 +18,7 @@ logger = structlog.getLogger()
 
 
 class DBot:
-    def __init__(self):
+    def __init__(self) -> None:
         self.client: app.dscrd.DiscordClient | None = None
         self.session: aiohttp.ClientSession | None = None
 
@@ -51,11 +51,15 @@ class DBot:
         )
         self.client = app.dscrd.DiscordClient(processing_service, check_interval=10)
 
-    async def run_async(self):
+    async def run_async(self) -> None:
         await self.initialize()
+
+        if self.client is None:
+            raise RuntimeError("Client is not initialized")
+
         await self.client.run_async(config_instance.discord_token)
 
-    def run(self):
+    def run(self) -> None:
         try:
             asyncio.run(self.run_async())
         except KeyboardInterrupt:

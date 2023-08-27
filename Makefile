@@ -44,8 +44,15 @@ lint/isort:
 	@echo "\033[92m> done\033[0m"
 	@echo
 
+.PHONY: lint/mypy
+lint/mypy:
+	@echo "\033[92m< linting using mypy...\033[0m"
+	$(POETRY) run mypy --show-error-codes --skip-cache-mtime-checks $(LINT_SOURCES_DIRS)
+	@echo "\033[92m> done\033[0m"
+	@echo
+
 .PHONY: lint
-lint: lint/black lint/isort
+lint: lint/black lint/isort lint/mypy
 
 
 .PHONY: fmt/black
