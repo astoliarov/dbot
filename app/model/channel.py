@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from model.notifications import (
+from app.model.notifications import (
     NewUserInChannelNotification,
     Notification,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
-from model.user import User
+from app.model.user import User
 
 
 @dataclass
@@ -22,7 +22,7 @@ class Channel:
         return notifications
 
     def _get_user_notifications(self) -> list[Notification]:
-        notifications = []
+        notifications: list[Notification] = []
 
         if self.previous_state is None:
             return []
@@ -38,7 +38,7 @@ class Channel:
         return notifications
 
     def _get_chanel_notifications(self) -> list[Notification]:
-        notifications = []
+        notifications: list[Notification] = []
 
         if self.previous_state is None:
             return []

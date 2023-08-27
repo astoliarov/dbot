@@ -1,0 +1,76 @@
+[tool.poetry]
+name = "discord-activity-bot"
+version = "1.1.0"
+description = ""
+authors = ["Alexei Stoliarov <alexei.stoliarov@gmail.com>"]
+license = "MIT"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Jinja2 = "^3.1.2"
+environs = "^9.5.0"
+sentry-sdk = "^1.5.10"
+pydantic = "^1.10.2"
+structlog = "^22.1.0"
+pytest-asyncio = "^0.20.1"
+isort = "^5.10.1"
+black = "^22.10.0"
+tenacity = "^8.1.0"
+discord-py = { extras = ["voice"], version = "^2.3.2" }
+redis = "^5.0.0"
+mypy = "^1.5.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+pytest-mock = "^3.7.0"
+black = "^22.3.0"
+isort = "^5.10.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+combine_as_imports = true
+profile = "black"
+
+[tool.mypy]
+plugins = [
+    "pydantic.mypy"
+]
+disallow_any_decorated = false
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+no_implicit_reexport = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
+mypy_path = "stubs"
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+[[tool.mypy.overrides]]
+module = [
+    "app.tests.*"
+]
+ignore_errors = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+#pythonpath = ["app"]
+addopts = [
+    "--import-mode=importlib",
+]

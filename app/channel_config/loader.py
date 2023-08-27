@@ -1,9 +1,8 @@
 from typing import Optional
 
 import structlog
-from pydantic import BaseModel
-
 from model import ChannelConfig, ChannelsConfig
+from pydantic import BaseModel
 
 logger = structlog.get_logger()
 
@@ -26,7 +25,7 @@ class ChannelConfigSerializer(BaseModel):
 class ConfigSerializer(BaseModel):
     channels: list[ChannelConfigSerializer]
 
-    def to_model(self):
+    def to_model(self) -> ChannelsConfig:
         return ChannelsConfig(channels=[c.to_model() for c in self.channels])
 
 

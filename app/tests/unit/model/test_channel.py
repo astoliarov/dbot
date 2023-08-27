@@ -1,10 +1,10 @@
-from model import (
+from app.model import (
     NewUserInChannelNotification,
     User,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
-from model.channel import Channel
+from app.model.channel import Channel
 
 
 class TestCaseChannel:

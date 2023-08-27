@@ -1,15 +1,19 @@
 import datetime
-from typing import Optional
+from typing import Any, Optional
 
+import redis
 import structlog
-from aioredis import Redis
 from pydantic import BaseModel
 
-from abstract import IDiscordClient
-from model import User
-from model.channel import Channel
+from app.abstract import IDiscordClient
+from app.model import User
+from app.model.channel import Channel
 
 logger = structlog.get_logger()
+
+
+async def open_redis(redis_url: str) -> redis.Redis:
+    return redis.asyncio.from_url(redis_url, socket_timeout=10)  # type: ignore
 
 
 def _get_timestamp() -> int:
@@ -49,7 +53,7 @@ class Repository:
     CHANNEL_KEY_PREFIX = "channel_v2_{channel_id}"
     STATE_LIFETIME = 60 * 60  # 1 hour
 
-    def __init__(self, redis_client: Redis, discord_client: Optional[IDiscordClient] = None) -> None:
+    def __init__(self, redis_client: redis.Redis, discord_client: Optional[IDiscordClient] = None) -> None:
         self.redis_client = redis_client
         self.discord_client = discord_client
 
@@ -88,5 +92,5 @@ class Repository:
 
         return state.to_model()
 
-    def _prepare_channel_key(self, channel_id) -> str:
+    def _prepare_channel_key(self, channel_id: Any) -> str:
         return self.CHANNEL_KEY_PREFIX.format(channel_id=channel_id)

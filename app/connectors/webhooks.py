@@ -6,13 +6,13 @@ from urllib.parse import quote_plus
 import structlog
 from jinja2 import Template
 
-from connectors.transport import WebhooksTransport
-from model import (
+from app.connectors.transport import WebhooksTransport
+from app.model import (
     ChannelConfig,
     NewUserInChannelNotification,
     UsersConnectedToChannelNotification,
 )
-from model.notifications import Notification, UsersLeftChannelNotification
+from app.model.notifications import Notification, UsersLeftChannelNotification
 
 logger = structlog.getLogger()
 
@@ -24,8 +24,8 @@ class NotificationTypesEnum(Enum):
 
 
 class WebhookService:
-    def __init__(self, channels_config: list[ChannelConfig]):
-        self.transport = WebhooksTransport()
+    def __init__(self, channels_config: list[ChannelConfig], transport: WebhooksTransport):
+        self.transport = transport
         self.channels_templates = {
             config.channel_id: self._init_channel_templates(config) for config in channels_config
         }

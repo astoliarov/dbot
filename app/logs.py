@@ -2,7 +2,7 @@ import logging
 
 import structlog
 
-from config import LogLevelEnum
+from app.config import LogLevelEnum
 
 name_to_level = {
     "CRITICAL": logging.CRITICAL,
@@ -17,7 +17,6 @@ name_to_level = {
 
 
 def initialize_logs(logging_level: LogLevelEnum) -> None:
-    print(logging_level)
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
