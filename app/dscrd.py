@@ -4,9 +4,9 @@ import typing
 import discord
 import structlog
 
-from abstract import IDiscordClient
-from model import User
-from services import ActivityProcessingService
+from app.abstract import IDiscordClient
+from app.model import User
+from app.services import ActivityProcessingService
 
 logger = structlog.get_logger()
 
@@ -23,7 +23,8 @@ class DiscordClient(discord.Client, IDiscordClient):
         self.processing_service.register_client(self)
         self.check_interval = check_interval
 
-        self.bg_task = self.loop.create_task(self.background_worker())
+    async def on_ready(self):
+        self.loop.create_task(self.background_worker())
 
     async def background_worker(self):
         logger.info("starting background task")
@@ -41,3 +42,21 @@ class DiscordClient(discord.Client, IDiscordClient):
             return None
 
         return [User(id=member.id, username=member.name) for member in channel.members]
+
+    async def run_async(
+        self,
+        token: str,
+        *,
+        reconnect: bool = True,
+    ) -> None:
+        async def runner():
+            async with self:
+                await self.start(token, reconnect=reconnect)
+
+        try:
+            await runner()
+        except KeyboardInterrupt:
+            # nothing to do here
+            # `asyncio.run` handles the loop cleanup
+            # and `self.start` closes all sockets and the HTTPClient instance.
+            return

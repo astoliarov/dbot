@@ -1,9 +1,8 @@
 from typing import Optional
 
 import structlog
-from pydantic import BaseModel
-
 from model import ChannelConfig, ChannelsConfig
+from pydantic import BaseModel
 
 logger = structlog.get_logger()
 

@@ -1,10 +1,10 @@
-from model.config import ChannelConfig, ChannelsConfig
-from model.notifications import (
+from app.model.config import ChannelConfig, ChannelsConfig
+from app.model.notifications import (
     NewUserInChannelNotification,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
-from model.user import ChannelInfo, User, UserActivityInfo
+from app.model.user import ChannelInfo, User, UserActivityInfo
 
 __all__ = (
     "User",

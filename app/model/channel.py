@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from model.notifications import (
+from app.model.notifications import (
     NewUserInChannelNotification,
     Notification,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
-from model.user import User
+from app.model.user import User
 
 
 @dataclass

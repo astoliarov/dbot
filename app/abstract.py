@@ -1,7 +1,7 @@
 import typing
 from abc import ABC, abstractmethod
 
-from model import User
+from app.model import User
 
 
 class IDiscordClient(ABC):

@@ -2,10 +2,10 @@ import typing
 
 import structlog
 
-from connectors.webhooks import WebhookService
-from model import ChannelConfig
-from monitoring import HealthChecksIOMonitoring
-from repository import Repository
+from app.connectors.webhooks import WebhookService
+from app.model import ChannelConfig
+from app.monitoring import HealthChecksIOMonitoring
+from app.repository import Repository
 
 logger = structlog.getLogger()
 

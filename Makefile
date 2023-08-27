@@ -1,32 +1,99 @@
-.PHONY: install-helm-redis
-install-helm-redis:
-	helm repo add bitnami https://charts.bitnami.com/bitnami
-	helm install redis-helm bitnami/redis --set usePassword=false --set cluster.enabled=false  --set master.persistence.enabled=false  --namespace=default
+POETRY ?= poetry
+LINT_SOURCES_DIRS = app
 
-.PHONY: lint-isort
-lint-isort:
-	isort --check-only --diff ./app
+###########################
+# Environment configuration
+###########################
 
-.PHONY: lint-black
-lint-black:
-	black --check --diff ./app
+.PHONY: poetry/install
+poetry/install:
+	pip install poetry==1.6.1
+
+.PHONY: poetry
+poetry: poetry/install
+
+.PHONY: install
+install:
+	$(POETRY) install --without dev
+
+.PHONY: install-dev
+install-dev:
+	$(POETRY) install
+
+.PHONY: env/prepare
+env/prepare:
+	cp .env.example .env
+	cp .envrc.example .envrc
+
+##################
+# Code style tools
+##################
+
+.PHONY: lint/black
+lint/black:
+	@echo "\033[92m< linting using black...\033[0m"
+	$(POETRY) run black --check --diff $(LINT_SOURCES_DIRS)
+	@echo "\033[92m> done\033[0m"
+	@echo
+
+
+.PHONY: lint/isort
+lint/isort:
+	@echo "\033[92m< linting using isort...\033[0m"
+	$(POETRY) run isort --check-only --diff $(LINT_SOURCES_DIRS)
+	@echo "\033[92m> done\033[0m"
+	@echo
 
 .PHONY: lint
-lint: lint-black lint-isort
+lint: lint/black lint/isort
 
-.PHONY: test
-test:
-	cd app/ && python -m pytest tests/ -vv
+
+.PHONY: fmt/black
+fmt/black:
+	@echo "\033[92m< formatting using black...\033[0m"
+	$(POETRY) run black $(LINT_SOURCES_DIRS)
+	@echo "\033[92m> done\033[0m"
+	@echo
+
+.PHONY: fmt/isort
+fmt/isort:
+	@echo "\033[92m< formatting using isort...\033[0m"
+	$(POETRY) run isort $(LINT_SOURCES_DIRS)
+	@echo "\033[92m> done\033[0m"
+	@echo
 
 .PHONY: fmt
-fmt:
-	black ./app
-	isort ./app
+fmt: fmt/black fmt/isort
+
+#########
+# Testing
+#########
+
+.PHONY: test/unit
+test/unit: TESTS ?= app/tests/unit
+test/unit:
+	$(POETRY) run python -m pytest -vv $(TESTS)
+
+.PHONY: test/integration
+test/integration: TESTS ?= app/tests/integration
+test/integration:
+	$(POETRY) run python -m pytest -vv $(TESTS)
+
+.PHONY: test
+test: test/unit test/integration
+
+#############
+# Entrypoints
+#############
 
 .PHONY: local-deploy/infrastructure
 local-deploy/infrastructure:
 	docker compose --profile=infra up
 
-.PHONY: application/run-local
-application/run-local:
-	cd app/ && python ./main.py
+.PHONY: local-deploy/application
+local-deploy/application:
+	docker compose --profile=infra --profile=app up --build
+
+.PHONY: run/app
+run/app:
+	python ./app/main.py

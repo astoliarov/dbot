@@ -1,3 +1,6 @@
+import asyncio
+import traceback
+
 import aiohttp
 import structlog
 import tenacity
@@ -6,10 +9,14 @@ from sentry_sdk import capture_exception
 logger = structlog.getLogger()
 
 
+async def initialize_session() -> aiohttp.ClientSession:
+    timeout = aiohttp.ClientTimeout(total=15.0, connect=5.0, sock_connect=5.0, sock_read=5.0)
+    return aiohttp.ClientSession(timeout=timeout)
+
+
 class WebhooksTransport:
-    def __init__(self) -> None:
-        timeout = aiohttp.ClientTimeout(total=15.0, connect=5.0, sock_connect=5.0, sock_read=5.0)
-        self.session = aiohttp.ClientSession(timeout=timeout)
+    def __init__(self, session: aiohttp.ClientSession) -> None:
+        self.session = session
 
     @tenacity.retry(
         reraise=False,
