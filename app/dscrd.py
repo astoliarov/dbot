@@ -19,7 +19,6 @@ class DiscordClient(discord.Client, IDiscordClient):
         *args: typing.Any,
         **kwargs: typing.Any,
     ) -> None:
-
         intents = discord.Intents.all()
         kwargs["intents"] = intents
 

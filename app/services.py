@@ -19,7 +19,6 @@ class ActivityProcessingService:
         channel_configs: list[ChannelConfig],
         monitoring: typing.Optional[HealthChecksIOMonitoring],
     ) -> None:
-
         self.repository = repository
         self.webhooks_service = webhooks_service
         self.channel_configs = channel_configs

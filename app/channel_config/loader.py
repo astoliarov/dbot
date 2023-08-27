@@ -1,8 +1,7 @@
-from typing import Optional
-
 import structlog
-from model import ChannelConfig, ChannelsConfig
 from pydantic import BaseModel
+
+from app.model import ChannelConfig, ChannelsConfig
 
 logger = structlog.get_logger()
 
@@ -11,7 +10,7 @@ class ChannelConfigSerializer(BaseModel):
     channel_id: int
     new_user_webhooks: list[str]
     users_connected_webhooks: list[str]
-    users_leave_webhooks: Optional[list[str]]
+    users_leave_webhooks: list[str] | None = None
 
     def to_model(self) -> ChannelConfig:
         return ChannelConfig(
@@ -34,7 +33,7 @@ class JSONLoader:
         with open(path, "r") as f:
             raw = f.read()
 
-        serializer = ConfigSerializer.parse_raw(raw)
+        serializer = ConfigSerializer.model_validate_json(raw)
 
         config = serializer.to_model()
         logger.debug("loaded config", config=config)

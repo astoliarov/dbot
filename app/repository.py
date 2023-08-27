@@ -63,7 +63,7 @@ class Repository:
     async def save(self, channel: Channel) -> None:
         state = ChannelState.from_model(channel)
         key = self._prepare_channel_key(channel.id)
-        await self.redis_client.set(key, state.json())
+        await self.redis_client.set(key, state.model_dump_json())
 
     async def get(self, channel_id: int) -> Optional[Channel]:
         assert self.discord_client
@@ -85,7 +85,7 @@ class Repository:
             logger.debug("no previous state", channel_id=channel_id)
             return None
 
-        state = ChannelState.parse_raw(data)
+        state = ChannelState.model_validate_json(data)
         if _get_timestamp() - state.ts > self.STATE_LIFETIME:
             logger.debug("previous state outdated", channel_id=channel_id)
             return None
