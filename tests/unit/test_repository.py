@@ -4,10 +4,10 @@ from unittest.mock import patch
 import pytest
 from redis.asyncio import Redis
 
-from app.dscrd import DiscordClient
-from app.model import User
-from app.model.channel import Channel
-from app.repository import Repository
+from dbot.dscrd import DiscordClient
+from dbot.model import User
+from dbot.model.channel import Channel
+from dbot.repository import Repository
 
 
 @pytest.fixture
@@ -35,7 +35,7 @@ class TestCaseRepository:
         )
         channel = Channel(users=[user], id=1)
 
-        with patch("app.repository._get_timestamp") as timestamp_mock:
+        with patch("dbot.repository._get_timestamp") as timestamp_mock:
             timestamp_mock.return_value = 100
             await repository.save(channel)
 
@@ -48,7 +48,7 @@ class TestCaseRepository:
         redis_client.get = mock.AsyncMock(return_value=previous_state)
         discord_client.get_channel_members = mock.Mock(return_value=[])
 
-        with patch("app.repository._get_timestamp") as timestamp_mock:
+        with patch("dbot.repository._get_timestamp") as timestamp_mock:
             timestamp_mock.return_value = 100
             channel = await repository.get(1)
 
@@ -61,7 +61,7 @@ class TestCaseRepository:
         redis_client.get = mock.AsyncMock(return_value=previous_state)
         discord_client.get_channel_members = mock.Mock(return_value=[])
 
-        with patch("app.repository._get_timestamp") as timestamp_mock:
+        with patch("dbot.repository._get_timestamp") as timestamp_mock:
             timestamp_mock.return_value = 10000
             channel = await repository.get(1)
 
@@ -73,7 +73,7 @@ class TestCaseRepository:
         redis_client.get = mock.AsyncMock(return_value=None)
         discord_client.get_channel_members = mock.Mock(return_value=[])
 
-        with patch("app.repository._get_timestamp") as timestamp_mock:
+        with patch("dbot.repository._get_timestamp") as timestamp_mock:
             timestamp_mock.return_value = 100
             channel = await repository.get(1)
 
@@ -84,7 +84,7 @@ class TestCaseRepository:
         redis_client.get = mock.AsyncMock(return_value=previous_state)
         discord_client.get_channel_members = mock.Mock(return_value=None)
 
-        with patch("app.repository._get_timestamp") as timestamp_mock:
+        with patch("dbot.repository._get_timestamp") as timestamp_mock:
             timestamp_mock.return_value = 100
             channel = await repository.get(1)
 

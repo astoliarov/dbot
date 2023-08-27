@@ -6,13 +6,13 @@ from urllib.parse import quote_plus
 import structlog
 from jinja2 import Template
 
-from app.connectors.transport import WebhooksTransport
-from app.model import (
+from dbot.connectors.transport import WebhooksTransport
+from dbot.model import (
     ChannelConfig,
     NewUserInChannelNotification,
     UsersConnectedToChannelNotification,
 )
-from app.model.notifications import Notification, UsersLeftChannelNotification
+from dbot.model.notifications import Notification, UsersLeftChannelNotification
 
 logger = structlog.getLogger()
 

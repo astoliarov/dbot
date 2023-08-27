@@ -1,10 +1,10 @@
-from app.model import (
+from dbot.model import (
     NewUserInChannelNotification,
     User,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
-from app.model.channel import Channel
+from dbot.model.channel import Channel
 
 
 class TestCaseChannel:

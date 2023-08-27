@@ -1,13 +1,13 @@
 import datetime
-from typing import Any, Optional
+from typing import Any
 
 import redis
 import structlog
 from pydantic import BaseModel
 
-from app.abstract import IDiscordClient
-from app.model import User
-from app.model.channel import Channel
+from dbot.abstract import IDiscordClient
+from dbot.model import User
+from dbot.model.channel import Channel
 
 logger = structlog.get_logger()
 
@@ -53,7 +53,7 @@ class Repository:
     CHANNEL_KEY_PREFIX = "channel_v2_{channel_id}"
     STATE_LIFETIME = 60 * 60  # 1 hour
 
-    def __init__(self, redis_client: redis.Redis, discord_client: Optional[IDiscordClient] = None) -> None:
+    def __init__(self, redis_client: redis.Redis, discord_client: IDiscordClient | None = None) -> None:
         self.redis_client = redis_client
         self.discord_client = discord_client
 
@@ -65,7 +65,7 @@ class Repository:
         key = self._prepare_channel_key(channel.id)
         await self.redis_client.set(key, state.model_dump_json())
 
-    async def get(self, channel_id: int) -> Optional[Channel]:
+    async def get(self, channel_id: int) -> Channel | None:
         assert self.discord_client
 
         users = self.discord_client.get_channel_members(channel_id)
@@ -78,7 +78,7 @@ class Repository:
         logger.debug("loaded channel", channel=channel)
         return channel
 
-    async def _load_previous_state(self, channel_id: int) -> Optional[Channel]:
+    async def _load_previous_state(self, channel_id: int) -> Channel | None:
         channel_key = self._prepare_channel_key(channel_id)
         data = await self.redis_client.get(channel_key)
         if data is None:

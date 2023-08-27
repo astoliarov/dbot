@@ -1,20 +1,20 @@
+import typing
 from dataclasses import dataclass
-from typing import Optional
 
-from app.model.notifications import (
+from dbot.model.notifications import (
     NewUserInChannelNotification,
     Notification,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
-from app.model.user import User
+from dbot.model.user import User
 
 
 @dataclass
 class Channel:
     id: int
     users: list[User]
-    previous_state: Optional["Channel"] = None
+    previous_state: typing.Optional["Channel"] = None
 
     def generate_notifications(self) -> list[Notification]:
         notifications = self._get_user_notifications()

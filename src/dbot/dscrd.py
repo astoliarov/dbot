@@ -4,9 +4,9 @@ import typing
 import discord
 import structlog
 
-from app.abstract import IDiscordClient
-from app.model import User
-from app.services import ActivityProcessingService
+from dbot.abstract import IDiscordClient
+from dbot.model import User
+from dbot.services import ActivityProcessingService
 
 logger = structlog.get_logger()
 
@@ -41,7 +41,7 @@ class DiscordClient(discord.Client, IDiscordClient):
                 logger.error(e)
             await asyncio.sleep(self.check_interval)  # task runs every 60 seconds
 
-    def get_channel_members(self, channel_id: int) -> typing.Optional[list[User]]:
+    def get_channel_members(self, channel_id: int) -> list[User] | None:
         channel = self.get_channel(channel_id)
         if channel is None:
             return None

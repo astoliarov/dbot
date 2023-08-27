@@ -2,7 +2,7 @@ import logging
 
 import structlog
 
-from app.config import LogLevelEnum
+from dbot.config import LogLevelEnum
 
 name_to_level = {
     "CRITICAL": logging.CRITICAL,

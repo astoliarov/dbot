@@ -2,13 +2,13 @@ from unittest import mock
 
 import pytest
 
-from app.connectors.webhooks import WebhookService
-from app.model import ChannelConfig
-from app.model.channel import Channel
-from app.model.notifications import Notification
-from app.monitoring import HealthChecksIOMonitoring
-from app.repository import Repository
-from app.services import ActivityProcessingService
+from dbot.connectors.webhooks import WebhookService
+from dbot.model import ChannelConfig
+from dbot.model.channel import Channel
+from dbot.model.notifications import Notification
+from dbot.monitoring import HealthChecksIOMonitoring
+from dbot.repository import Repository
+from dbot.services import ActivityProcessingService
 
 
 @pytest.fixture

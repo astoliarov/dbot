@@ -2,11 +2,11 @@ import typing
 
 import structlog
 
-from app.abstract import IDiscordClient
-from app.connectors.webhooks import WebhookService
-from app.model import ChannelConfig
-from app.monitoring import HealthChecksIOMonitoring
-from app.repository import Repository
+from dbot.abstract import IDiscordClient
+from dbot.connectors.webhooks import WebhookService
+from dbot.model import ChannelConfig
+from dbot.monitoring import HealthChecksIOMonitoring
+from dbot.repository import Repository
 
 logger = structlog.getLogger()
 
@@ -17,7 +17,7 @@ class ActivityProcessingService:
         repository: Repository,
         webhooks_service: WebhookService,
         channel_configs: list[ChannelConfig],
-        monitoring: typing.Optional[HealthChecksIOMonitoring],
+        monitoring: HealthChecksIOMonitoring | None,
     ) -> None:
         self.repository = repository
         self.webhooks_service = webhooks_service

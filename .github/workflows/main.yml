@@ -1,6 +1,6 @@
 name: CI
 
-on: [push]
+on: [ push ]
 
 jobs:
   test:
@@ -29,5 +29,11 @@ jobs:
 
       - name: Run tests
         run: make test
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Run build docker
+        run: make docker/build
 
 

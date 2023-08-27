@@ -1,5 +1,5 @@
 POETRY ?= poetry
-LINT_SOURCES_DIRS = app
+LINT_SOURCES_DIRS = src tests
 
 ###########################
 # Environment configuration
@@ -77,12 +77,12 @@ fmt: fmt/black fmt/isort
 #########
 
 .PHONY: test/unit
-test/unit: TESTS ?= app/tests/unit
+test/unit: TESTS ?= tests/unit
 test/unit:
 	$(POETRY) run python -m pytest -vv $(TESTS)
 
 .PHONY: test/integration
-test/integration: TESTS ?= app/tests/integration
+test/integration: TESTS ?= tests/integration
 test/integration:
 	$(POETRY) run python -m pytest -vv $(TESTS)
 
@@ -103,4 +103,23 @@ local-deploy/application:
 
 .PHONY: run/app
 run/app:
-	python ./app/main.py
+	python src/dbot/main.py
+
+##########
+### Docker
+##########
+
+IMAGE ?=dbot
+TAG ?= latest
+
+.PHONY: docker/build
+docker/build:
+	docker build . \
+	--tag $(IMAGE):latest \
+	--target base \
+	--file ./Dockerfile
+
+.PHONY: docker/tag
+docker/tag:
+	docker tag $(IMAGE):latest $(IMAGE):$(TAG)
+
