@@ -17,7 +17,7 @@ class Configuration(BaseSettings):
 
     discord_token: str
     redis_url: str
-    channel_config_path: str = "./app/channel_config/config.json"
+    channel_config_path: str = "./src/dbot/channel_config/config.json"
     sentry_dsn: str = ""
     logging_level: LogLevelEnum = LogLevelEnum.DEBUG
     healthchecksio_webhook: str = ""

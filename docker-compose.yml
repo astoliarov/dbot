@@ -2,7 +2,7 @@ version: "3.9"
 services:
   dbot:
     build: .
-    command: python app/main.py
+    command: python /app/src/dbot/main.py
     env_file:
       - ./values/local.env
     profiles: ["app"]

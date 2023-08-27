@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from app.model.user import User
+from dbot.model.user import User
 
 
 @dataclass

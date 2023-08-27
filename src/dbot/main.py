@@ -3,23 +3,23 @@ import asyncio
 import aiohttp
 import sentry_sdk
 import structlog
-from connectors.transport import WebhooksTransport, initialize_session
 
-import app.dscrd
-from app.channel_config.loader import JSONLoader
-from app.config import config_instance
-from app.connectors.webhooks import WebhookService
-from app.logs import initialize_logs
-from app.monitoring import HealthChecksIOMonitoring
-from app.repository import Repository, open_redis
-from app.services import ActivityProcessingService
+import dbot.dscrd
+from dbot.channel_config.loader import JSONLoader
+from dbot.config import config_instance
+from dbot.connectors.transport import WebhooksTransport, initialize_session
+from dbot.connectors.webhooks import WebhookService
+from dbot.logs import initialize_logs
+from dbot.monitoring import HealthChecksIOMonitoring
+from dbot.repository import Repository, open_redis
+from dbot.services import ActivityProcessingService
 
 logger = structlog.getLogger()
 
 
 class DBot:
     def __init__(self) -> None:
-        self.client: app.dscrd.DiscordClient | None = None
+        self.client: dbot.dscrd.DiscordClient | None = None
         self.session: aiohttp.ClientSession | None = None
 
     async def initialize(self) -> None:
@@ -49,7 +49,7 @@ class DBot:
             channel_config.channels,
             healthchecks_io_monitoring,
         )
-        self.client = app.dscrd.DiscordClient(processing_service, check_interval=10)
+        self.client = dbot.dscrd.DiscordClient(processing_service, check_interval=10)
 
     async def run_async(self) -> None:
         await self.initialize()
@@ -67,5 +67,5 @@ class DBot:
 
 
 if __name__ == "__main__":
-    dbot = DBot()
-    dbot.run()
+    instance = DBot()
+    instance.run()

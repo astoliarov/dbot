@@ -37,17 +37,17 @@ Common labels
 helm.sh/chart: {{ include "dbot.chart" . }}
 {{ include "dbot.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+dbot.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+dbot.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
 Selector labels
 */}}
 {{- define "dbot.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "dbot.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+dbot.kubernetes.io/name: {{ include "dbot.name" . }}
+dbot.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*

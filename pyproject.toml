@@ -4,7 +4,7 @@ version = "1.1.0"
 description = ""
 authors = ["Alexei Stoliarov <alexei.stoliarov@gmail.com>"]
 license = "MIT"
-packages = [{ include = "app" }]
+packages = [{ include = "dbot", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -62,13 +62,13 @@ warn_untyped_fields = true
 
 [[tool.mypy.overrides]]
 module = [
-    "app.tests.*"
+    "tests.*"
 ]
 ignore_errors = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-#pythonpath = ["app"]
+pythonpath = ["src"]
 addopts = [
     "--import-mode=importlib",
 ]
