@@ -78,7 +78,6 @@ class WebhookService:
 
     @send.register
     async def _(self, notification: UsersLeftChannelNotification) -> None:
-
         data = {
             "id": notification.channel_id,
             "type": NotificationTypesEnum.USERS_LEAVE.value,

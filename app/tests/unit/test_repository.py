@@ -40,7 +40,7 @@ class TestCaseRepository:
             await repository.save(channel)
 
         redis_client.set.assert_called_once_with(
-            "channel_v2_1", '{"id": 1, "ts": 100, "users": [{"username": "test", "id": 2}]}'
+            "channel_v2_1", '{"id":1,"ts":100,"users":[{"username":"test","id":2}]}'
         )
 
     async def test__get__previous_state_and_users_exists__channel_built(self, repository, redis_client, discord_client):
