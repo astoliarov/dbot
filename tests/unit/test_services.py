@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from dbot.connectors.webhooks import WebhookService
+from dbot.connectors.abstract import IConnector
 from dbot.model import ChannelConfig
 from dbot.model.channel import Channel
 from dbot.model.notifications import Notification
@@ -23,7 +23,7 @@ def monitoring():
 
 @pytest.fixture
 def webhooks_service():
-    webhooks_service = mock.AsyncMock(spec=WebhookService)
+    webhooks_service = mock.AsyncMock(spec=IConnector)
     webhooks_service.send = mock.AsyncMock()
 
     return webhooks_service

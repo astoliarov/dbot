@@ -7,8 +7,8 @@ import structlog
 import dbot.dscrd
 from dbot.channel_config.loader import JSONLoader
 from dbot.config import config_instance
-from dbot.connectors.transport import WebhooksTransport, initialize_session
-from dbot.connectors.webhooks import WebhookService
+from dbot.connectors.webhooks.transport import WebhooksTransport, initialize_session
+from dbot.connectors.webhooks.webhooks import WebhookService
 from dbot.logs import initialize_logs
 from dbot.monitoring import HealthChecksIOMonitoring
 from dbot.repository import Repository, open_redis
@@ -33,11 +33,11 @@ class DBot:
         else:
             healthchecks_io_monitoring = None
 
-        loader = JSONLoader()
-        channel_config = loader.from_file(config_instance.channel_config_path)
-
         redis_client = await open_redis(config_instance.redis_url)
         repository = Repository(redis_client=redis_client)
+
+        loader = JSONLoader()
+        channel_config = loader.from_file(config_instance.channel_config_path)
 
         self.session = await initialize_session()
         transport = WebhooksTransport(self.session)

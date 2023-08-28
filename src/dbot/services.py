@@ -1,9 +1,7 @@
-import typing
-
 import structlog
 
 from dbot.abstract import IDiscordClient
-from dbot.connectors.webhooks import WebhookService
+from dbot.connectors.abstract import IConnector
 from dbot.model import ChannelConfig
 from dbot.monitoring import HealthChecksIOMonitoring
 from dbot.repository import Repository
@@ -15,7 +13,7 @@ class ActivityProcessingService:
     def __init__(
         self,
         repository: Repository,
-        webhooks_service: WebhookService,
+        webhooks_service: IConnector,
         channel_configs: list[ChannelConfig],
         monitoring: HealthChecksIOMonitoring | None,
     ) -> None:

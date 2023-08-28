@@ -6,7 +6,8 @@ from urllib.parse import quote_plus
 import structlog
 from jinja2 import Template
 
-from dbot.connectors.transport import WebhooksTransport
+from dbot.connectors.abstract import IConnector
+from dbot.connectors.webhooks.transport import WebhooksTransport
 from dbot.model import (
     ChannelConfig,
     NewUserInChannelNotification,
@@ -23,7 +24,7 @@ class NotificationTypesEnum(Enum):
     USERS_LEAVE = "users_leave"
 
 
-class WebhookService:
+class WebhookService(IConnector):
     def __init__(self, channels_config: list[ChannelConfig], transport: WebhooksTransport):
         self.transport = transport
         self.channels_templates = {
