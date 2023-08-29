@@ -3,10 +3,10 @@ from unittest import mock
 import pytest
 
 from dbot.connectors.abstract import IConnector
+from dbot.infrastructure.monitoring import HealthChecksIOMonitoring
 from dbot.model import ChannelConfig
 from dbot.model.channel import Channel
 from dbot.model.notifications import Notification
-from dbot.monitoring import HealthChecksIOMonitoring
 from dbot.repository import Repository
 from dbot.services import ActivityProcessingService
 

@@ -1,9 +1,9 @@
 import structlog
 
-from dbot.abstract import IDiscordClient
 from dbot.connectors.abstract import IConnector
+from dbot.dscrd.abstract import IDiscordClient
+from dbot.infrastructure.monitoring import IMonitoring
 from dbot.model import ChannelConfig
-from dbot.monitoring import HealthChecksIOMonitoring
 from dbot.repository import Repository
 
 logger = structlog.getLogger()
@@ -15,7 +15,7 @@ class ActivityProcessingService:
         repository: Repository,
         webhooks_service: IConnector,
         channel_configs: list[ChannelConfig],
-        monitoring: HealthChecksIOMonitoring | None,
+        monitoring: IMonitoring | None,
     ) -> None:
         self.repository = repository
         self.webhooks_service = webhooks_service

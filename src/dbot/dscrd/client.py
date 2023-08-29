@@ -4,7 +4,7 @@ import typing
 import discord
 import structlog
 
-from dbot.abstract import IDiscordClient
+from dbot.dscrd.abstract import IDiscordClient
 from dbot.model import User
 from dbot.services import ActivityProcessingService
 

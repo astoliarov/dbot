@@ -1,8 +1,18 @@
 import logging
+from enum import Enum
 
 import structlog
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from dbot.config import LogLevelEnum
+
+class LogLevelEnum(Enum):
+    CRITICAL = "CRITICAL"
+    FATAL = "FATAL"
+    ERROR = "ERROR"
+    WARNING = "WARNING"
+    INFO = "INFO"
+    DEBUG = "DEBUG"
+
 
 name_to_level = {
     "CRITICAL": logging.CRITICAL,
@@ -16,7 +26,17 @@ name_to_level = {
 }
 
 
-def initialize_logs(logging_level: LogLevelEnum) -> None:
+class LoggingConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="dbot_logging_", case_sensitive=False)
+
+    logging_level: LogLevelEnum = LogLevelEnum.DEBUG
+
+
+def initialize_logs() -> None:
+    logging_config = LoggingConfig()
+
+    level = logging_config.logging_level.value
+
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
@@ -26,7 +46,7 @@ def initialize_logs(logging_level: LogLevelEnum) -> None:
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.dev.ConsoleRenderer(),
         ],
-        wrapper_class=structlog.make_filtering_bound_logger(name_to_level[logging_level.value]),
+        wrapper_class=structlog.make_filtering_bound_logger(name_to_level[level]),
         context_class=dict,
         logger_factory=structlog.PrintLoggerFactory(),
         cache_logger_on_first_use=False,

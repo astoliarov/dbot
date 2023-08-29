@@ -5,7 +5,7 @@ import redis
 import structlog
 from pydantic import BaseModel
 
-from dbot.abstract import IDiscordClient
+from dbot.dscrd.abstract import IDiscordClient
 from dbot.model import User
 from dbot.model.channel import Channel
 
