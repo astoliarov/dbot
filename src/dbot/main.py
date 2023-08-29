@@ -4,13 +4,13 @@ import aiohttp
 import sentry_sdk
 import structlog
 
-import dbot.dscrd
 from dbot.channel_config.loader import JSONLoader
-from dbot.config import config_instance
 from dbot.connectors.webhooks.transport import WebhooksTransport, initialize_session
 from dbot.connectors.webhooks.webhooks import WebhookService
-from dbot.logs import initialize_logs
-from dbot.monitoring import HealthChecksIOMonitoring
+from dbot.dscrd.client import DiscordClient
+from dbot.infrastructure.config import config_instance
+from dbot.infrastructure.logs import initialize_logs
+from dbot.infrastructure.monitoring import initialize_monitoring
 from dbot.repository import Repository, open_redis
 from dbot.services import ActivityProcessingService
 
@@ -19,19 +19,16 @@ logger = structlog.getLogger()
 
 class DBot:
     def __init__(self) -> None:
-        self.client: dbot.dscrd.DiscordClient | None = None
+        self.client: DiscordClient | None = None
         self.session: aiohttp.ClientSession | None = None
 
     async def initialize(self) -> None:
-        initialize_logs(config_instance.logging_level)
+        initialize_logs()
 
         if config_instance.sentry_dsn:
             sentry_sdk.init(config_instance.sentry_dsn)
 
-        if config_instance.healthchecksio_webhook:
-            healthchecks_io_monitoring = HealthChecksIOMonitoring(webhook=config_instance.healthchecksio_webhook)
-        else:
-            healthchecks_io_monitoring = None
+        monitoring = initialize_monitoring()
 
         redis_client = await open_redis(config_instance.redis_url)
         repository = Repository(redis_client=redis_client)
@@ -47,9 +44,9 @@ class DBot:
             repository,
             webhooks_service,
             channel_config.channels,
-            healthchecks_io_monitoring,
+            monitoring,
         )
-        self.client = dbot.dscrd.DiscordClient(processing_service, check_interval=10)
+        self.client = DiscordClient(processing_service, check_interval=10)
 
     async def run_async(self) -> None:
         await self.initialize()

@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 from redis.asyncio import Redis
 
-from dbot.dscrd import DiscordClient
+from dbot.dscrd.client import DiscordClient
 from dbot.model import User
 from dbot.model.channel import Channel
 from dbot.repository import Repository
