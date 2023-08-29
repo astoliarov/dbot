@@ -5,7 +5,7 @@ from dbot.model.notifications import Notification
 
 
 class IConnector(ABC):
-    @abstractmethod
     @singledispatchmethod
+    @abstractmethod
     async def send(self, notification: Notification) -> None:
         ...
