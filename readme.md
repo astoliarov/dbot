@@ -1,5 +1,7 @@
 # dbot - Discord Voice Channel Activity Monitor
 
+![Build status](https://github.com/astoliarov/dbot/actions/workflows/main.yml/badge.svg)
+
 **dbot** is a lightweight bot designed to monitor voice channel activity in Discord servers. It keeps track of user join
 and leave events within voice channels and provides way to receive notifications through webhooks whenever
 these events occur.
