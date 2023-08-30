@@ -8,7 +8,7 @@ from dbot.channel_config.loader import JSONLoader
 from dbot.connectors.webhooks.transport import WebhooksTransport, initialize_session
 from dbot.connectors.webhooks.webhooks import WebhookService
 from dbot.dscrd.client import DiscordClient
-from dbot.infrastructure.config import config_instance
+from dbot.infrastructure.config import config_instance, redis_config_instance
 from dbot.infrastructure.logs import initialize_logs
 from dbot.infrastructure.monitoring import initialize_monitoring
 from dbot.repository import Repository, open_redis
@@ -30,7 +30,7 @@ class DBot:
 
         monitoring = initialize_monitoring()
 
-        redis_client = await open_redis(config_instance.redis_url)
+        redis_client = await open_redis(redis_config_instance.url)
         repository = Repository(redis_client=redis_client)
 
         loader = JSONLoader()

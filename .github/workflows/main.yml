@@ -6,6 +6,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      redis:
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v2
 
@@ -26,6 +36,11 @@ jobs:
 
       - name: Run lint
         run: make lint
+
+      - name: Activate CI environment
+        uses: c-py/action-dotenv-to-setenv@v2
+        with:
+          env-file: .env.ci
 
       - name: Run tests
         run: make test
