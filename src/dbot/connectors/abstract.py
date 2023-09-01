@@ -1,11 +1,16 @@
 from abc import ABC, abstractmethod
-from functools import singledispatchmethod
+from enum import Enum
 
 from dbot.model.notifications import Notification
 
 
+class NotificationTypesEnum(Enum):
+    NEW_USER = "new_user"
+    USERS_CONNECTED = "users_connected"
+    USERS_LEAVE = "users_leave"
+
+
 class IConnector(ABC):
-    @singledispatchmethod
     @abstractmethod
-    async def send(self, notification: Notification) -> None:
+    async def send(self, notifications: list[Notification]) -> None:
         ...

@@ -13,12 +13,12 @@ class ActivityProcessingService:
     def __init__(
         self,
         repository: Repository,
-        webhooks_service: IConnector,
+        connector: IConnector,
         channel_configs: list[ChannelConfig],
         monitoring: IMonitoring | None,
     ) -> None:
         self.repository = repository
-        self.webhooks_service = webhooks_service
+        self.connector = connector
         self.channel_configs = channel_configs
         self.monitoring = monitoring
 
@@ -45,7 +45,7 @@ class ActivityProcessingService:
             return
 
         notifications = channel.generate_notifications()
-        for notification in notifications:
-            await self.webhooks_service.send(notification)
+
+        await self.connector.send(notifications)
 
         await self.repository.save(channel)

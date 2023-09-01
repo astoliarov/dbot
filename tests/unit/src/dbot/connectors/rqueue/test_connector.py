@@ -1,6 +1,7 @@
 import json
 from unittest import mock
 
+import freezegun
 import pytest
 import redis
 
@@ -21,25 +22,31 @@ def client():
 
 
 @pytest.fixture
+def time_freeze():
+    with freezegun.freeze_time("2023-10-10T10:10:10"):
+        yield
+
+
+@pytest.fixture
 def connector(client):
     return RedisConnector(client, TEST_QUEUE_NAME)
 
 
-async def test__send__new_user_in_channel(connector):
+async def test__send__new_user_in_channel(connector, time_freeze):
     notification = NewUserInChannelNotification(
         user=User(username="test", id=1),
         channel_id=1,
     )
 
-    await connector.send(notification)
+    await connector.send([notification])
 
     connector.client.lpush.assert_called_once_with(
         TEST_QUEUE_NAME,
-        '{"version":1,"type":"new_user","data":{"username":"test","id":1}}',
+        '{"version":1,"type":"new_user","data":{"username":"test","id":1},' '"happened_at":"2023-10-10T10:10:10Z"}',
     )
 
 
-async def test__send__users_connected_to_channel(connector):
+async def test__send__users_connected_to_channel(connector, time_freeze):
     notification = UsersConnectedToChannelNotification(
         users=[
             User(username="test1", id=1),
@@ -48,22 +55,23 @@ async def test__send__users_connected_to_channel(connector):
         channel_id=1,
     )
 
-    await connector.send(notification)
+    await connector.send([notification])
 
     connector.client.lpush.assert_called_once_with(
         TEST_QUEUE_NAME,
-        '{"version":1,"type":"users_connected","data":{"usernames":["test1","test2"],"id":1}}',
+        '{"version":1,"type":"users_connected","data":{"usernames":["test1","test2"],"id":1},'
+        '"happened_at":"2023-10-10T10:10:10Z"}',
     )
 
 
-async def test__send__users_left_channel(connector):
+async def test__send__users_left_channel(connector, time_freeze):
     notification = UsersLeftChannelNotification(
         channel_id=1,
     )
 
-    await connector.send(notification)
+    await connector.send([notification])
 
     connector.client.lpush.assert_called_once_with(
         TEST_QUEUE_NAME,
-        '{"version":1,"type":"users_left","data":{"id":1}}',
+        '{"version":1,"type":"users_leave","data":{"id":1},' '"happened_at":"2023-10-10T10:10:10Z"}',
     )
