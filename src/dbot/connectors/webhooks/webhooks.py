@@ -1,12 +1,12 @@
+import asyncio
 import typing
-from enum import Enum
 from functools import singledispatchmethod
 from urllib.parse import quote_plus
 
 import structlog
 from jinja2 import Template
 
-from dbot.connectors.abstract import IConnector
+from dbot.connectors.abstract import IConnector, NotificationTypesEnum
 from dbot.connectors.webhooks.transport import WebhooksTransport
 from dbot.model import (
     ChannelConfig,
@@ -16,12 +16,6 @@ from dbot.model import (
 from dbot.model.notifications import Notification, UsersLeftChannelNotification
 
 logger = structlog.getLogger()
-
-
-class NotificationTypesEnum(Enum):
-    NEW_USER = "new_user"
-    USERS_CONNECTED = "users_connected"
-    USERS_LEAVE = "users_leave"
 
 
 class WebhookService(IConnector):
@@ -40,11 +34,15 @@ class WebhookService(IConnector):
             "users_leave_webhooks": [Template(template_str) for template_str in channel_config.users_leave_webhooks],
         }
 
+    async def send(self, notifications: list[Notification]) -> None:
+        tasks = [asyncio.create_task(self._send_one(notification)) for notification in notifications]
+        await asyncio.gather(*tasks)
+
     @singledispatchmethod
-    async def send(self, notification: Notification) -> None:
+    async def _send_one(self, notification: Notification) -> None:
         raise NotImplementedError()
 
-    @send.register
+    @_send_one.register
     async def _(self, notification: NewUserInChannelNotification) -> None:
         data = {
             "username": notification.user.username,
@@ -59,7 +57,7 @@ class WebhookService(IConnector):
             link = template.render(**data)
             await self.transport.call(link)
 
-    @send.register
+    @_send_one.register
     async def _(self, notification: UsersConnectedToChannelNotification) -> None:
         usernames = [user.username for user in notification.users]
         usernames_safe = quote_plus(",".join(usernames))
@@ -77,7 +75,7 @@ class WebhookService(IConnector):
             link = template.render(**data)
             await self.transport.call(link)
 
-    @send.register
+    @_send_one.register
     async def _(self, notification: UsersLeftChannelNotification) -> None:
         data = {
             "id": notification.channel_id,

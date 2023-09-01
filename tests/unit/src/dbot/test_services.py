@@ -22,25 +22,25 @@ def monitoring():
 
 
 @pytest.fixture
-def webhooks_service():
-    webhooks_service = mock.AsyncMock(spec=IConnector)
-    webhooks_service.send = mock.AsyncMock()
+def connector():
+    connector = mock.AsyncMock(spec=IConnector)
+    connector.send = mock.AsyncMock()
 
-    return webhooks_service
+    return connector
 
 
 @pytest.fixture
-def service(repository, webhooks_service, monitoring):
+def service(repository, connector, monitoring):
     return ActivityProcessingService(
         repository=repository,
-        webhooks_service=webhooks_service,
+        connector=connector,
         channel_configs=[],
         monitoring=monitoring,
     )
 
 
 class TestCaseService:
-    async def test__process__no_errors__notification_send(self, service, repository, webhooks_service):
+    async def test__process__no_errors__notification_send(self, service, repository, connector):
         configs = [
             ChannelConfig(channel_id=1, new_user_webhooks=[], users_leave_webhooks=[], users_connected_webhooks=[])
         ]
@@ -54,4 +54,4 @@ class TestCaseService:
 
         await service.process()
 
-        webhooks_service.send.assert_called_once_with(notification)
+        connector.send.assert_called_once_with([notification])
