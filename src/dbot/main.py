@@ -4,6 +4,7 @@ import aiohttp
 import sentry_sdk
 import structlog
 
+from dbot.channel_config import new_loader
 from dbot.channel_config.loader import JSONLoader
 from dbot.connectors.webhooks.transport import WebhooksTransport, initialize_session
 from dbot.connectors.webhooks.webhooks import WebhookService
@@ -35,6 +36,9 @@ class DBot:
 
         loader = JSONLoader()
         channel_config = loader.from_file(config_instance.channel_config_path)
+
+        _loader = new_loader.JSONLoader()
+        _channel_config = _loader.from_file("./src/dbot/channel_config/new_config.json")
 
         self.session = await initialize_session()
         transport = WebhooksTransport(self.session)

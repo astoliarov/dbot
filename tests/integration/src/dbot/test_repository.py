@@ -35,8 +35,8 @@ class TestCaseCommon:
     async def test__send__called_twice__twice_sent_to_redis(self, connector, client, time_freeze):
         await connector.send(
             [
-                NewUserInChannelNotification(User(id=1, username="test_user"), 1),
-                NewUserInChannelNotification(User(id=2, username="test_user_2"), 1),
+                NewUserInChannelNotification(user=User(id=1, username="test_user"), channel_id=1),
+                NewUserInChannelNotification(user=User(id=2, username="test_user_2"), channel_id=1),
             ]
         )
 
@@ -60,7 +60,7 @@ class TestCaseCommon:
 
 class TestCaseSendDifferentTypes:
     async def test__send__new_user__sent_to_redis(self, connector, client, time_freeze):
-        await connector.send([NewUserInChannelNotification(User(id=1, username="test_user"), 1)])
+        await connector.send([NewUserInChannelNotification(user=User(id=1, username="test_user"), channel_id=1)])
 
         raw_data = await client.rpop("test_queue")
 

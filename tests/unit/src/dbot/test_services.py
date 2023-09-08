@@ -46,7 +46,7 @@ class TestCaseService:
         ]
         service.channel_configs = configs
 
-        notification = Notification()
+        notification = Notification(channel_id=1)
         channel = mock.Mock(spec=Channel)
         channel.generate_notifications.return_value = [notification]
 
