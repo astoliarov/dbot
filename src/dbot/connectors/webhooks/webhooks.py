@@ -9,13 +9,13 @@ from jinja2 import Template
 from dbot.connectors.abstract import IConnector, NotificationTypesEnum
 from dbot.connectors.webhooks.transport import WebhooksTransport
 from dbot.model import NewUserInChannelNotification, UsersConnectedToChannelNotification
-from dbot.model.config import ChannelMonitorConfig, MonitorConfig, WebhooksTargetConfig
+from dbot.model.config import ChannelMonitorConfig, MonitorConfig
 from dbot.model.notifications import Notification, UsersLeftChannelNotification
 
 logger = structlog.getLogger()
 
 
-class WebhookService(IConnector):
+class WebhooksConnector(IConnector):
     def __init__(self, config: MonitorConfig, transport: WebhooksTransport):
         self.transport = transport
         self.channels_templates = {
