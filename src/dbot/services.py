@@ -1,9 +1,8 @@
 import structlog
 
-from dbot.connectors.abstract import IConnector
+from dbot.connectors.router import NotificationRouter
 from dbot.dscrd.abstract import IDiscordClient
 from dbot.infrastructure.monitoring import IMonitoring
-from dbot.model import ChannelConfig
 from dbot.repository import Repository
 
 logger = structlog.getLogger()
@@ -13,13 +12,13 @@ class ActivityProcessingService:
     def __init__(
         self,
         repository: Repository,
-        connector: IConnector,
-        channel_configs: list[ChannelConfig],
+        router: NotificationRouter,
+        channels: set[int],
         monitoring: IMonitoring | None,
     ) -> None:
         self.repository = repository
-        self.connector = connector
-        self.channel_configs = channel_configs
+        self.router = router
+        self.channels = channels
         self.monitoring = monitoring
 
     def register_client(self, discord_client: IDiscordClient) -> None:
@@ -31,21 +30,21 @@ class ActivityProcessingService:
 
     async def process(self) -> None:
         logger.info("starting channels processing")
-        for channel in self.channel_configs:
-            await self._process_chanel(channel)
+        for channel_id in self.channels:
+            await self._process_chanel(channel_id)
 
         await self.on_proces_finish()
         logger.info("finished channels processing")
 
-    async def _process_chanel(self, config: ChannelConfig) -> None:
-        logger.debug("started channel processing", channel_id=config.channel_id)
+    async def _process_chanel(self, channel_id: int) -> None:
+        logger.debug("started channel processing", channel_id=channel_id)
 
-        channel = await self.repository.get(config.channel_id)
+        channel = await self.repository.get(channel_id)
         if channel is None:
             return
 
         notifications = channel.generate_notifications()
 
-        await self.connector.send(notifications)
+        await self.router.send(notifications)
 
         await self.repository.save(channel)
