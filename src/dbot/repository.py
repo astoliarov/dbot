@@ -12,7 +12,7 @@ from dbot.model.channel import Channel
 logger = structlog.get_logger()
 
 
-async def open_redis(redis_url: str) -> redis.Redis:
+async def open_redis(redis_url: str) -> redis.asyncio.Redis:
     return redis.asyncio.from_url(redis_url, socket_timeout=10)  # type: ignore
 
 
@@ -53,7 +53,7 @@ class Repository:
     CHANNEL_KEY_PREFIX = "channel_v2_{channel_id}"
     STATE_LIFETIME = 60 * 60  # 1 hour
 
-    def __init__(self, redis_client: redis.Redis, discord_client: IDiscordClient | None = None) -> None:
+    def __init__(self, redis_client: redis.asyncio.Redis, discord_client: IDiscordClient | None = None) -> None:
         self.redis_client = redis_client
         self.discord_client = discord_client
 

@@ -7,6 +7,7 @@ import redis
 from pydantic import BaseModel
 
 from dbot.connectors.abstract import IConnector, NotificationTypesEnum
+from dbot.model import MonitorConfig
 from dbot.model.notifications import (
     NewUserInChannelNotification,
     Notification,
@@ -23,9 +24,25 @@ class Message(BaseModel):
 
 
 class RedisConnector(IConnector):
-    def __init__(self, client: redis.asyncio.Redis, queue_name: str) -> None:
+    def __init__(self, client: redis.asyncio.Redis, config: MonitorConfig) -> None:
         self.client = client
-        self.queue_name = queue_name
+        self.config = config
+
+        self.channel_queue_map = self._prepare_queues_for_channels(config)
+
+    def _prepare_queues_for_channels(self, config: MonitorConfig) -> dict[int, str]:
+        channel_queue_map = {}
+
+        for channel in config.channels:
+            if channel.redis is None:
+                continue
+
+            channel_queue_map[channel.channel_id] = channel.redis.queue
+
+        return channel_queue_map
+
+    def _get_queue(self, channel_id: int) -> str | None:
+        return self.channel_queue_map.get(channel_id)
 
     async def send(self, notifications: list[Notification]) -> None:
         for notification in notifications:
@@ -37,33 +54,45 @@ class RedisConnector(IConnector):
 
     @_send_one.register
     async def _(self, notification: NewUserInChannelNotification) -> None:
+        queue = self._get_queue(notification.channel_id)
+        if not queue:
+            return
+
         data = {
             "username": notification.user.username,
             "id": notification.user.id,
         }
-        await self._send(data, NotificationTypesEnum.NEW_USER, 1)
+        await self._send(queue, data, NotificationTypesEnum.NEW_USER, 1)
 
     @_send_one.register
     async def _(self, notification: UsersConnectedToChannelNotification) -> None:
+        queue = self._get_queue(notification.channel_id)
+        if not queue:
+            return
+
         data = {
             "usernames": [user.username for user in notification.users],
             "id": notification.channel_id,
         }
-        await self._send(data, NotificationTypesEnum.USERS_CONNECTED, 1)
+        await self._send(queue, data, NotificationTypesEnum.USERS_CONNECTED, 1)
 
     @_send_one.register
     async def _(self, notification: UsersLeftChannelNotification) -> None:
+        queue = self._get_queue(notification.channel_id)
+        if not queue:
+            return
+
         data = {
             "id": notification.channel_id,
         }
-        await self._send(data, NotificationTypesEnum.USERS_LEAVE, 1)
+        await self._send(queue, data, NotificationTypesEnum.USERS_LEAVE, 1)
 
-    async def _send(self, data: dict[str, Any], _type: NotificationTypesEnum, version: int) -> None:
+    async def _send(self, queue: str, data: dict[str, Any], _type: NotificationTypesEnum, version: int) -> None:
         happened_at = datetime.datetime.now(tz=datetime.timezone.utc)
         message = Message(version=version, type=_type, data=data, happened_at=happened_at)
         raw = message.model_dump_json()
 
-        future = self.client.lpush(self.queue_name, raw)
+        future = self.client.lpush(queue, raw)
 
         if not inspect.isawaitable(future):
             raise TypeError("Expected awaitable, got %r" % type(future))

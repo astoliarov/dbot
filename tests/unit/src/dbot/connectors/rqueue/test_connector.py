@@ -6,7 +6,8 @@ import pytest
 import redis
 
 from dbot.connectors.rqueue.connector import RedisConnector
-from dbot.model import User
+from dbot.model import MonitorConfig, User
+from dbot.model.config import ChannelMonitorConfig, RedisTargetConfig
 from dbot.model.notifications import (
     NewUserInChannelNotification,
     UsersConnectedToChannelNotification,
@@ -29,7 +30,20 @@ def time_freeze():
 
 @pytest.fixture
 def connector(client):
-    return RedisConnector(client, TEST_QUEUE_NAME)
+    return RedisConnector(
+        client,
+        MonitorConfig(
+            channels=[
+                ChannelMonitorConfig(
+                    channel_id=1,
+                    redis=RedisTargetConfig(
+                        queue=TEST_QUEUE_NAME,
+                    ),
+                    webhooks=None,
+                )
+            ]
+        ),
+    )
 
 
 async def test__send__new_user_in_channel(connector, time_freeze):

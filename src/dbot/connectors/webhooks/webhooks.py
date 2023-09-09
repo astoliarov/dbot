@@ -8,30 +8,36 @@ from jinja2 import Template
 
 from dbot.connectors.abstract import IConnector, NotificationTypesEnum
 from dbot.connectors.webhooks.transport import WebhooksTransport
-from dbot.model import (
-    ChannelConfig,
-    NewUserInChannelNotification,
-    UsersConnectedToChannelNotification,
-)
+from dbot.model import NewUserInChannelNotification, UsersConnectedToChannelNotification
+from dbot.model.config import ChannelMonitorConfig, MonitorConfig
 from dbot.model.notifications import Notification, UsersLeftChannelNotification
 
 logger = structlog.getLogger()
 
 
-class WebhookService(IConnector):
-    def __init__(self, channels_config: list[ChannelConfig], transport: WebhooksTransport):
+class WebhooksConnector(IConnector):
+    def __init__(
+        self,
+        transport: WebhooksTransport,
+        config: MonitorConfig,
+    ):
         self.transport = transport
         self.channels_templates = {
-            config.channel_id: self._init_channel_templates(config) for config in channels_config
+            config.channel_id: self._init_channel_templates(config) for config in config.channels
         }
 
-    def _init_channel_templates(self, channel_config: ChannelConfig) -> typing.Dict[str, list[Template]]:
+    def _init_channel_templates(self, channel_config: ChannelMonitorConfig) -> typing.Dict[str, list[Template]]:
+        if channel_config.webhooks is None:
+            return {}
+
+        webhooks_target = channel_config.webhooks
+
         return {
-            "new_user_webhooks": [Template(template_str) for template_str in channel_config.new_user_webhooks],
+            "new_user_webhooks": [Template(template_str) for template_str in webhooks_target.new_user_webhooks],
             "users_connected_webhooks": [
-                Template(template_str) for template_str in channel_config.users_connected_webhooks
+                Template(template_str) for template_str in webhooks_target.users_connected_webhooks
             ],
-            "users_leave_webhooks": [Template(template_str) for template_str in channel_config.users_leave_webhooks],
+            "users_leave_webhooks": [Template(template_str) for template_str in webhooks_target.users_leave_webhooks],
         }
 
     async def send(self, notifications: list[Notification]) -> None:

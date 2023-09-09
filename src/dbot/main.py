@@ -4,13 +4,16 @@ import aiohttp
 import sentry_sdk
 import structlog
 
-from dbot.channel_config.loader import JSONLoader
+from dbot.config_loader.loader import JSONLoader
+from dbot.connectors.router import NotificationRouter
+from dbot.connectors.rqueue.connector import RedisConnector
 from dbot.connectors.webhooks.transport import WebhooksTransport, initialize_session
-from dbot.connectors.webhooks.webhooks import WebhookService
+from dbot.connectors.webhooks.webhooks import WebhooksConnector
 from dbot.dscrd.client import DiscordClient
 from dbot.infrastructure.config import config_instance, redis_config_instance
 from dbot.infrastructure.logs import initialize_logs
 from dbot.infrastructure.monitoring import initialize_monitoring
+from dbot.model.config import TargetTypeEnum
 from dbot.repository import Repository, open_redis
 from dbot.services import ActivityProcessingService
 
@@ -34,17 +37,21 @@ class DBot:
         repository = Repository(redis_client=redis_client)
 
         loader = JSONLoader()
-        channel_config = loader.from_file(config_instance.channel_config_path)
+        monitor_config = loader.from_file(config_instance.channel_config_path)
 
         self.session = await initialize_session()
         transport = WebhooksTransport(self.session)
-        webhooks_service = WebhookService(channel_config.channels, transport)
+        webhooks_connector = WebhooksConnector(transport, monitor_config)
+        redis_connector = RedisConnector(redis_client, monitor_config)
+
+        router = NotificationRouter(monitor_config)
+        router.register_connector(TargetTypeEnum.WEBHOOKS, webhooks_connector)
 
         processing_service = ActivityProcessingService(
-            repository,
-            webhooks_service,
-            channel_config.channels,
-            monitoring,
+            repository=repository,
+            router=router,
+            channels=monitor_config.channels_ids,
+            monitoring=monitoring,
         )
         self.client = DiscordClient(processing_service, check_interval=10)
 

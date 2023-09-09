@@ -2,9 +2,8 @@ from unittest import mock
 
 import pytest
 
-from dbot.connectors.abstract import IConnector
+from dbot.connectors.router import NotificationRouter
 from dbot.infrastructure.monitoring import HealthChecksIOMonitoring
-from dbot.model import ChannelConfig
 from dbot.model.channel import Channel
 from dbot.model.notifications import Notification
 from dbot.repository import Repository
@@ -22,31 +21,28 @@ def monitoring():
 
 
 @pytest.fixture
-def connector():
-    connector = mock.AsyncMock(spec=IConnector)
+def router():
+    connector = mock.AsyncMock(spec=NotificationRouter)
     connector.send = mock.AsyncMock()
 
     return connector
 
 
 @pytest.fixture
-def service(repository, connector, monitoring):
+def service(repository, router, monitoring):
     return ActivityProcessingService(
         repository=repository,
-        connector=connector,
-        channel_configs=[],
+        router=router,
+        channels=set(),
         monitoring=monitoring,
     )
 
 
 class TestCaseService:
-    async def test__process__no_errors__notification_send(self, service, repository, connector):
-        configs = [
-            ChannelConfig(channel_id=1, new_user_webhooks=[], users_leave_webhooks=[], users_connected_webhooks=[])
-        ]
-        service.channel_configs = configs
+    async def test__process__no_errors__notification_send(self, service, repository, router):
+        service.channels = {1}
 
-        notification = Notification()
+        notification = Notification(channel_id=1)
         channel = mock.Mock(spec=Channel)
         channel.generate_notifications.return_value = [notification]
 
@@ -54,4 +50,4 @@ class TestCaseService:
 
         await service.process()
 
-        connector.send.assert_called_once_with([notification])
+        router.send.assert_called_once_with([notification])

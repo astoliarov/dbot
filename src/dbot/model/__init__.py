@@ -1,4 +1,4 @@
-from dbot.model.config import ChannelConfig, ChannelsConfig
+from dbot.model.config import MonitorConfig
 from dbot.model.notifications import (
     NewUserInChannelNotification,
     UsersConnectedToChannelNotification,
@@ -13,6 +13,5 @@ __all__ = (
     "NewUserInChannelNotification",
     "UsersConnectedToChannelNotification",
     "UsersLeftChannelNotification",
-    "ChannelsConfig",
-    "ChannelConfig",
+    "MonitorConfig",
 )
