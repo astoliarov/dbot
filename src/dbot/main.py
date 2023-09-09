@@ -37,7 +37,7 @@ class DBot:
         repository = Repository(redis_client=redis_client)
 
         loader = JSONLoader()
-        monitor_config = loader.from_file(config_instance.channel_config_path)
+        monitor_config = loader.from_file(config_instance.monitor_config_path)
 
         self.session = await initialize_session()
         transport = WebhooksTransport(self.session)
@@ -46,6 +46,7 @@ class DBot:
 
         router = NotificationRouter(monitor_config)
         router.register_connector(TargetTypeEnum.WEBHOOKS, webhooks_connector)
+        router.register_connector(TargetTypeEnum.REDIS, redis_connector)
 
         processing_service = ActivityProcessingService(
             repository=repository,
