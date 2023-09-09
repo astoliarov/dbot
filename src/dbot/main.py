@@ -4,7 +4,7 @@ import aiohttp
 import sentry_sdk
 import structlog
 
-from dbot.channel_config import new_loader
+from dbot.config_loader.loader import JSONLoader
 from dbot.connectors.router import NotificationRouter
 from dbot.connectors.webhooks.transport import WebhooksTransport, initialize_session
 from dbot.connectors.webhooks.webhooks import WebhookService
@@ -35,8 +35,8 @@ class DBot:
         redis_client = await open_redis(redis_config_instance.url)
         repository = Repository(redis_client=redis_client)
 
-        loader = new_loader.JSONLoader()
-        monitor_config = loader.from_file("./src/dbot/channel_config/new_config.json")
+        loader = JSONLoader()
+        monitor_config = loader.from_file(config_instance.channel_config_path)
 
         self.session = await initialize_session()
         transport = WebhooksTransport(self.session)

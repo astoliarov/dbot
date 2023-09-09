@@ -1,6 +1,6 @@
 import json
 
-from dbot.channel_config.new_loader import JSONLoader
+from dbot.config_loader.loader import JSONLoader
 from dbot.model.config import (
     ChannelMonitorConfig,
     MonitorConfig,
