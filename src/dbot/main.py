@@ -6,6 +6,7 @@ import structlog
 
 from dbot.config_loader.loader import JSONLoader
 from dbot.connectors.router import NotificationRouter
+from dbot.connectors.rqueue.connector import RedisConnector
 from dbot.connectors.webhooks.transport import WebhooksTransport, initialize_session
 from dbot.connectors.webhooks.webhooks import WebhooksConnector
 from dbot.dscrd.client import DiscordClient
@@ -40,7 +41,8 @@ class DBot:
 
         self.session = await initialize_session()
         transport = WebhooksTransport(self.session)
-        webhooks_connector = WebhooksConnector(monitor_config, transport)
+        webhooks_connector = WebhooksConnector(transport, monitor_config)
+        redis_connector = RedisConnector(redis_client, monitor_config)
 
         router = NotificationRouter(monitor_config)
         router.register_connector(TargetTypeEnum.WEBHOOKS, webhooks_connector)

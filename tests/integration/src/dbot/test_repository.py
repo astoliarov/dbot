@@ -7,11 +7,13 @@ import redis
 from dbot.connectors.rqueue.connector import RedisConnector
 from dbot.infrastructure.config import redis_config_instance
 from dbot.model import (
+    MonitorConfig,
     NewUserInChannelNotification,
     User,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
+from dbot.model.config import ChannelMonitorConfig, RedisTargetConfig
 from dbot.repository import open_redis
 
 
@@ -22,7 +24,20 @@ async def client() -> redis.Redis:
 
 @pytest.fixture()
 async def connector(client):
-    return RedisConnector(client, "test_queue")
+    return RedisConnector(
+        client,
+        MonitorConfig(
+            channels=[
+                ChannelMonitorConfig(
+                    channel_id=1,
+                    redis=RedisTargetConfig(
+                        queue="test_queue",
+                    ),
+                    webhooks=None,
+                )
+            ]
+        ),
+    )
 
 
 @pytest.fixture

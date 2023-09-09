@@ -16,7 +16,11 @@ logger = structlog.getLogger()
 
 
 class WebhooksConnector(IConnector):
-    def __init__(self, config: MonitorConfig, transport: WebhooksTransport):
+    def __init__(
+        self,
+        transport: WebhooksTransport,
+        config: MonitorConfig,
+    ):
         self.transport = transport
         self.channels_templates = {
             config.channel_id: self._init_channel_templates(config) for config in config.channels
