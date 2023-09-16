@@ -69,7 +69,7 @@ class RedisConnector(IConnector):
 
     @_send_one.register
     async def _(self, notification: UsersLeftChannelNotification) -> None:
-        data = {}
+        data: dict[Any, Any] = {}
         await self._send(notification.channel_id, data, NotificationTypesEnum.USERS_LEAVE, 1)
 
     async def _send(self, channel_id: int, data: dict[str, Any], _type: NotificationTypesEnum, version: int) -> None:

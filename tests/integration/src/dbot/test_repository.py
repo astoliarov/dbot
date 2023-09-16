@@ -115,4 +115,10 @@ class TestCaseSendDifferentTypes:
 
         data = json.loads(raw_data.decode("utf-8"))
 
-        assert data == {"data": {}, "channel_id": 1, "type": "users_leave", "version": 1, "happened_at": "2023-10-10T10:10:10Z"}
+        assert data == {
+            "data": {},
+            "channel_id": 1,
+            "type": "users_leave",
+            "version": 1,
+            "happened_at": "2023-10-10T10:10:10Z",
+        }
