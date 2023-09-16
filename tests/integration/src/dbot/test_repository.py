@@ -55,20 +55,22 @@ class TestCaseCommon:
             ]
         )
 
-        raw_message_1 = await client.rpop("test_queue")
-        raw_message_2 = await client.rpop("test_queue")
+        raw_message_1 = await client.lpop("test_queue")
+        raw_message_2 = await client.lpop("test_queue")
 
         assert json.loads(raw_message_1.decode("utf-8")) == {
-            "data": {"id": 1, "username": "test_user"},
+            "data": {"username": "test_user"},
             "type": "new_user",
             "version": 1,
+            "channel_id": 1,
             "happened_at": "2023-10-10T10:10:10Z",
         }
 
         assert json.loads(raw_message_2.decode("utf-8")) == {
-            "data": {"id": 2, "username": "test_user_2"},
+            "data": {"username": "test_user_2"},
             "type": "new_user",
             "version": 1,
+            "channel_id": 1,
             "happened_at": "2023-10-10T10:10:10Z",
         }
 
@@ -77,14 +79,15 @@ class TestCaseSendDifferentTypes:
     async def test__send__new_user__sent_to_redis(self, connector, client, time_freeze):
         await connector.send([NewUserInChannelNotification(user=User(id=1, username="test_user"), channel_id=1)])
 
-        raw_data = await client.rpop("test_queue")
+        raw_data = await client.lpop("test_queue")
 
         data = json.loads(raw_data.decode("utf-8"))
 
         assert data == {
-            "data": {"id": 1, "username": "test_user"},
+            "data": {"username": "test_user"},
             "type": "new_user",
             "version": 1,
+            "channel_id": 1,
             "happened_at": "2023-10-10T10:10:10Z",
         }
 
@@ -93,12 +96,13 @@ class TestCaseSendDifferentTypes:
             [UsersConnectedToChannelNotification(users=[User(id=1, username="test_user")], channel_id=1)]
         )
 
-        raw_data = await client.rpop("test_queue")
+        raw_data = await client.lpop("test_queue")
 
         data = json.loads(raw_data.decode("utf-8"))
 
         assert data == {
-            "data": {"id": 1, "usernames": ["test_user"]},
+            "data": {"usernames": ["test_user"]},
+            "channel_id": 1,
             "type": "users_connected",
             "version": 1,
             "happened_at": "2023-10-10T10:10:10Z",
@@ -107,8 +111,8 @@ class TestCaseSendDifferentTypes:
     async def test__send__users_left_channel__sent_to_redis(self, connector, client, time_freeze):
         await connector.send([UsersLeftChannelNotification(channel_id=1)])
 
-        raw_data = await client.rpop("test_queue")
+        raw_data = await client.lpop("test_queue")
 
         data = json.loads(raw_data.decode("utf-8"))
 
-        assert data == {"data": {"id": 1}, "type": "users_leave", "version": 1, "happened_at": "2023-10-10T10:10:10Z"}
+        assert data == {"data": {}, "channel_id": 1, "type": "users_leave", "version": 1, "happened_at": "2023-10-10T10:10:10Z"}

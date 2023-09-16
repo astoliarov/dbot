@@ -20,6 +20,7 @@ class Message(BaseModel):
     version: int
     type: NotificationTypesEnum
     data: dict[str, Any]
+    channel_id: int
     happened_at: datetime.datetime
 
 
@@ -54,45 +55,33 @@ class RedisConnector(IConnector):
 
     @_send_one.register
     async def _(self, notification: NewUserInChannelNotification) -> None:
-        queue = self._get_queue(notification.channel_id)
-        if not queue:
-            return
-
         data = {
             "username": notification.user.username,
-            "id": notification.user.id,
         }
-        await self._send(queue, data, NotificationTypesEnum.NEW_USER, 1)
+        await self._send(notification.channel_id, data, NotificationTypesEnum.NEW_USER, 1)
 
     @_send_one.register
     async def _(self, notification: UsersConnectedToChannelNotification) -> None:
-        queue = self._get_queue(notification.channel_id)
-        if not queue:
-            return
-
         data = {
             "usernames": [user.username for user in notification.users],
-            "id": notification.channel_id,
         }
-        await self._send(queue, data, NotificationTypesEnum.USERS_CONNECTED, 1)
+        await self._send(notification.channel_id, data, NotificationTypesEnum.USERS_CONNECTED, 1)
 
     @_send_one.register
     async def _(self, notification: UsersLeftChannelNotification) -> None:
-        queue = self._get_queue(notification.channel_id)
+        data = {}
+        await self._send(notification.channel_id, data, NotificationTypesEnum.USERS_LEAVE, 1)
+
+    async def _send(self, channel_id: int, data: dict[str, Any], _type: NotificationTypesEnum, version: int) -> None:
+        queue = self._get_queue(channel_id)
         if not queue:
             return
 
-        data = {
-            "id": notification.channel_id,
-        }
-        await self._send(queue, data, NotificationTypesEnum.USERS_LEAVE, 1)
-
-    async def _send(self, queue: str, data: dict[str, Any], _type: NotificationTypesEnum, version: int) -> None:
         happened_at = datetime.datetime.now(tz=datetime.timezone.utc)
-        message = Message(version=version, type=_type, data=data, happened_at=happened_at)
+        message = Message(version=version, type=_type, data=data, happened_at=happened_at, channel_id=channel_id)
         raw = message.model_dump_json()
 
-        future = self.client.lpush(queue, raw)
+        future = self.client.rpush(queue, raw)
 
         if not inspect.isawaitable(future):
             raise TypeError("Expected awaitable, got %r" % type(future))
