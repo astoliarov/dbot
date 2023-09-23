@@ -14,6 +14,11 @@ class NewUserInChannelNotification(Notification):
 
 
 @dataclass
+class UserLeftChannelNotification(Notification):
+    user: User
+
+
+@dataclass
 class UsersConnectedToChannelNotification(Notification):
     users: list[User]
 
