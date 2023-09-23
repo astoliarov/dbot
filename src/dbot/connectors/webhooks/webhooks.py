@@ -51,7 +51,7 @@ class WebhooksConnector(IConnector):
             TemplatesEnum.USERS_CONNECTED: [
                 Template(template_str) for template_str in webhooks_target.users_connected_webhooks
             ],
-            TemplatesEnum.USERS_LEFT: [Template(template_str) for template_str in webhooks_target.users_leave_webhooks],
+            TemplatesEnum.USERS_LEFT: [Template(template_str) for template_str in webhooks_target.user_left_webhooks],
             TemplatesEnum.USER_LEFT: [Template(template_str) for template_str in webhooks_target.user_left_webhooks],
         }
 

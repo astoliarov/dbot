@@ -31,7 +31,7 @@ def test__channel_config_loader__two_targets():
                 "webhooks": {
                     "new_user_webhooks": ["http://localhost:8000"],
                     "users_connected_webhooks": ["http://localhost:8001"],
-                    "users_leave_webhooks": ["http://localhost:8002"],
+                    "users_left_webhooks": ["http://localhost:8002"],
                     "user_left_webhooks": ["http://localhost:8003"],
                 },
                 "redis": {
@@ -50,7 +50,7 @@ def test__channel_config_loader__two_targets():
                 webhooks=WebhooksTargetConfig(
                     new_user_webhooks=["http://localhost:8000"],
                     users_connected_webhooks=["http://localhost:8001"],
-                    users_leave_webhooks=["http://localhost:8002"],
+                    users_left_webhooks=["http://localhost:8002"],
                     user_left_webhooks=["http://localhost:8003"],
                 ),
                 redis=RedisTargetConfig(

@@ -15,14 +15,14 @@ logger = structlog.get_logger()
 class WebhooksTargetConfigSerializer(BaseModel):
     new_user_webhooks: list[str] | None = None
     users_connected_webhooks: list[str] | None = None
-    users_leave_webhooks: list[str] | None = None
+    users_left_webhooks: list[str] | None = None
     user_left_webhooks: list[str] | None = None
 
     def to_model(self) -> WebhooksTargetConfig:
         return WebhooksTargetConfig(
             new_user_webhooks=self.new_user_webhooks or [],
             users_connected_webhooks=self.users_connected_webhooks or [],
-            users_leave_webhooks=self.users_leave_webhooks or [],
+            users_left_webhooks=self.users_left_webhooks or [],
             user_left_webhooks=self.user_left_webhooks or [],
         )
 
