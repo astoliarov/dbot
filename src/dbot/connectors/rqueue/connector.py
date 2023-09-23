@@ -57,6 +57,7 @@ class RedisConnector(IConnector):
     @_send_one.register
     async def _(self, notification: NewUserInChannelNotification) -> None:
         data = {
+            "id": notification.user.id,
             "username": notification.user.username,
         }
         await self._send(notification.channel_id, data, NotificationTypesEnum.NEW_USER, 1)
@@ -64,6 +65,7 @@ class RedisConnector(IConnector):
     @_send_one.register
     async def _(self, notification: UserLeftChannelNotification) -> None:
         data = {
+            "id": notification.user.id,
             "username": notification.user.username,
         }
         await self._send(notification.channel_id, data, NotificationTypesEnum.USER_LEFT, 1)
@@ -72,6 +74,13 @@ class RedisConnector(IConnector):
     async def _(self, notification: UsersConnectedToChannelNotification) -> None:
         data = {
             "usernames": [user.username for user in notification.users],
+            "users": [
+                {
+                    "id": user.id,
+                    "username": user.username,
+                }
+                for user in notification.users
+            ],
         }
         await self._send(notification.channel_id, data, NotificationTypesEnum.USERS_CONNECTED, 1)
 
