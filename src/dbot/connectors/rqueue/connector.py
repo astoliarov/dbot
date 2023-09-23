@@ -11,6 +11,7 @@ from dbot.model import MonitorConfig
 from dbot.model.notifications import (
     NewUserInChannelNotification,
     Notification,
+    UserLeftChannelNotification,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
@@ -61,6 +62,13 @@ class RedisConnector(IConnector):
         await self._send(notification.channel_id, data, NotificationTypesEnum.NEW_USER, 1)
 
     @_send_one.register
+    async def _(self, notification: UserLeftChannelNotification) -> None:
+        data = {
+            "username": notification.user.username,
+        }
+        await self._send(notification.channel_id, data, NotificationTypesEnum.USER_LEFT, 1)
+
+    @_send_one.register
     async def _(self, notification: UsersConnectedToChannelNotification) -> None:
         data = {
             "usernames": [user.username for user in notification.users],
@@ -70,7 +78,7 @@ class RedisConnector(IConnector):
     @_send_one.register
     async def _(self, notification: UsersLeftChannelNotification) -> None:
         data: dict[Any, Any] = {}
-        await self._send(notification.channel_id, data, NotificationTypesEnum.USERS_LEAVE, 1)
+        await self._send(notification.channel_id, data, NotificationTypesEnum.USER_LEFT, 1)
 
     async def _send(self, channel_id: int, data: dict[str, Any], _type: NotificationTypesEnum, version: int) -> None:
         queue = self._get_queue(channel_id)

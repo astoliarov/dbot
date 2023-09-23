@@ -87,5 +87,5 @@ async def test__send__users_left_channel(connector, time_freeze):
 
     connector.client.rpush.assert_called_once_with(
         TEST_QUEUE_NAME,
-        '{"version":1,"type":"users_leave","data":{},"channel_id":1,"happened_at":"2023-10-10T10:10:10Z"}',
+        '{"version":1,"type":"users_left","data":{},"channel_id":1,"happened_at":"2023-10-10T10:10:10Z"}',
     )

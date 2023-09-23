@@ -7,7 +7,8 @@ from dbot.model.notifications import Notification
 class NotificationTypesEnum(Enum):
     NEW_USER = "new_user"
     USERS_CONNECTED = "users_connected"
-    USERS_LEAVE = "users_leave"
+    USERS_LEFT = "users_left"
+    USER_LEFT = "users_left"
 
 
 class IConnector(ABC):
