@@ -8,7 +8,7 @@ class NotificationTypesEnum(Enum):
     NEW_USER = "new_user"
     USERS_CONNECTED = "users_connected"
     USERS_LEFT = "users_left"
-    USER_LEFT = "users_left"
+    USER_LEFT = "user_left"
 
 
 class IConnector(ABC):
