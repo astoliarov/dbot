@@ -13,7 +13,7 @@ class WebhooksTargetConfig:
     new_user_webhooks: list[str]
     users_connected_webhooks: list[str]
     user_left_webhooks: list[str]
-    users_leave_webhooks: list[str]
+    users_left_webhooks: list[str]
 
     @property
     def type(self) -> TargetTypeEnum:

@@ -118,7 +118,7 @@ class TestCaseSendDifferentTypes:
         assert data == {
             "data": {},
             "channel_id": 1,
-            "type": "users_leave",
+            "type": "users_left",
             "version": 1,
             "happened_at": "2023-10-10T10:10:10Z",
         }
