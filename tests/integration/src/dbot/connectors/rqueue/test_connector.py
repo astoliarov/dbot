@@ -14,6 +14,7 @@ from dbot.model import (
     UsersLeftChannelNotification,
 )
 from dbot.model.config import ChannelMonitorConfig, RedisTargetConfig
+from dbot.model.notifications import UserLeftChannelNotification
 from dbot.repository import open_redis
 
 
@@ -59,7 +60,7 @@ class TestCaseCommon:
         raw_message_2 = await client.lpop("test_queue")
 
         assert json.loads(raw_message_1.decode("utf-8")) == {
-            "data": {"username": "test_user"},
+            "data": {"id": 1, "username": "test_user"},
             "type": "new_user",
             "version": 1,
             "channel_id": 1,
@@ -67,7 +68,7 @@ class TestCaseCommon:
         }
 
         assert json.loads(raw_message_2.decode("utf-8")) == {
-            "data": {"username": "test_user_2"},
+            "data": {"id": 2, "username": "test_user_2"},
             "type": "new_user",
             "version": 1,
             "channel_id": 1,
@@ -84,7 +85,7 @@ class TestCaseSendDifferentTypes:
         data = json.loads(raw_data.decode("utf-8"))
 
         assert data == {
-            "data": {"username": "test_user"},
+            "data": {"id": 1, "username": "test_user"},
             "type": "new_user",
             "version": 1,
             "channel_id": 1,
@@ -101,7 +102,15 @@ class TestCaseSendDifferentTypes:
         data = json.loads(raw_data.decode("utf-8"))
 
         assert data == {
-            "data": {"usernames": ["test_user"]},
+            "data": {
+                "users": [
+                    {
+                        "id": 1,
+                        "username": "test_user",
+                    }
+                ],
+                "usernames": ["test_user"],
+            },
             "channel_id": 1,
             "type": "users_connected",
             "version": 1,
@@ -117,6 +126,24 @@ class TestCaseSendDifferentTypes:
 
         assert data == {
             "data": {},
+            "channel_id": 1,
+            "type": "users_left",
+            "version": 1,
+            "happened_at": "2023-10-10T10:10:10Z",
+        }
+
+    async def test__send__user_left_channel__sent_to_redis(self, connector, client, time_freeze):
+        await connector.send([UserLeftChannelNotification(channel_id=1, user=User(id=1, username="test_user"))])
+
+        raw_data = await client.lpop("test_queue")
+
+        data = json.loads(raw_data.decode("utf-8"))
+
+        assert data == {
+            "data": {
+                "id": 1,
+                "username": "test_user",
+            },
             "channel_id": 1,
             "type": "users_left",
             "version": 1,

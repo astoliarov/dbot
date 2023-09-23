@@ -10,6 +10,7 @@ from dbot.model import MonitorConfig, User
 from dbot.model.config import ChannelMonitorConfig, RedisTargetConfig
 from dbot.model.notifications import (
     NewUserInChannelNotification,
+    UserLeftChannelNotification,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
@@ -56,7 +57,7 @@ async def test__send__new_user_in_channel(connector, time_freeze):
 
     connector.client.rpush.assert_called_once_with(
         TEST_QUEUE_NAME,
-        '{"version":1,"type":"new_user","data":{"username":"test"},"channel_id":1,"happened_at":"2023-10-10T10:10:10Z"}',
+        '{"version":1,"type":"new_user","data":{"id":1,"username":"test"},"channel_id":1,"happened_at":"2023-10-10T10:10:10Z"}',
     )
 
 
@@ -73,7 +74,7 @@ async def test__send__users_connected_to_channel(connector, time_freeze):
 
     connector.client.rpush.assert_called_once_with(
         TEST_QUEUE_NAME,
-        '{"version":1,"type":"users_connected","data":{"usernames":["test1","test2"]},'
+        '{"version":1,"type":"users_connected","data":{"usernames":["test1","test2"],"users":[{"id":1,"username":"test1"},{"id":2,"username":"test2"}]},'
         '"channel_id":1,"happened_at":"2023-10-10T10:10:10Z"}',
     )
 
@@ -88,4 +89,15 @@ async def test__send__users_left_channel(connector, time_freeze):
     connector.client.rpush.assert_called_once_with(
         TEST_QUEUE_NAME,
         '{"version":1,"type":"users_left","data":{},"channel_id":1,"happened_at":"2023-10-10T10:10:10Z"}',
+    )
+
+
+async def test__send__user_left_channel(connector, time_freeze):
+    notification = UserLeftChannelNotification(channel_id=1, user=User(username="test_user", id=1))
+
+    await connector.send([notification])
+
+    connector.client.rpush.assert_called_once_with(
+        TEST_QUEUE_NAME,
+        '{"version":1,"type":"users_left","data":{"id":1,"username":"test_user"},"channel_id":1,"happened_at":"2023-10-10T10:10:10Z"}',
     )
