@@ -5,6 +5,7 @@ from dbot.model import (
     UsersLeftChannelNotification,
 )
 from dbot.model.channel import Channel
+from dbot.model.notifications import UserLeftChannelNotification
 
 
 class TestCaseChannel:
@@ -57,5 +58,6 @@ class TestCaseChannel:
         notifications = channel.generate_notifications()
 
         assert notifications == [
+            UserLeftChannelNotification(channel_id=channel.id, user=user),
             UsersLeftChannelNotification(channel_id=channel.id),
         ]

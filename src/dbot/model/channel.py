@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from dbot.model.notifications import (
     NewUserInChannelNotification,
     Notification,
+    UserLeftChannelNotification,
     UsersConnectedToChannelNotification,
     UsersLeftChannelNotification,
 )
@@ -34,6 +35,10 @@ class Channel:
             old_user = old_users.get(user_id)
             if not old_user:
                 notifications.append(NewUserInChannelNotification(user=user, channel_id=self.id))
+
+        for user_id, user in old_users.items():
+            if user_id not in new_users:
+                notifications.append(UserLeftChannelNotification(user=user, channel_id=self.id))
 
         return notifications
 
