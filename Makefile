@@ -93,9 +93,13 @@ test: test/unit test/integration
 # Entrypoints
 #############
 
-.PHONY: local-deploy/infrastructure
-local-deploy/infrastructure:
+.PHONY: local-deploy/infrastructure/up
+local-deploy/infrastructure/up:
 	docker compose --profile=infra up
+
+.PHONY: local-deploy/infrastructure/down
+local-deploy/infrastructure/down:
+	docker compose --profile=infra down
 
 .PHONY: local-deploy/application
 local-deploy/application:
