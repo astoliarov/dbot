@@ -56,17 +56,6 @@ jobs:
 
   test-integration:
     runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis
-        # Set health checks to wait until redis has started
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
     steps:
       - uses: actions/checkout@v2
 
@@ -84,6 +73,9 @@ jobs:
 
       - name: Install dependencies
         run: make install-dev
+
+      - name: Start services
+        run: make local-deploy/infrastructure/up
 
       - name: Activate CI environment
         uses: c-py/action-dotenv-to-setenv@v2
