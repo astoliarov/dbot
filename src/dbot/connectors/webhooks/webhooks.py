@@ -51,7 +51,7 @@ class WebhooksConnector(IConnector):
             TemplatesEnum.USERS_CONNECTED: [
                 Template(template_str) for template_str in webhooks_target.users_connected_webhooks
             ],
-            TemplatesEnum.USERS_LEFT: [Template(template_str) for template_str in webhooks_target.user_left_webhooks],
+            TemplatesEnum.USERS_LEFT: [Template(template_str) for template_str in webhooks_target.users_left_webhooks],
             TemplatesEnum.USER_LEFT: [Template(template_str) for template_str in webhooks_target.user_left_webhooks],
         }
 
@@ -85,7 +85,7 @@ class WebhooksConnector(IConnector):
             "username": notification.user.username,
             "id": notification.channel_id,
             "user_id": notification.user.id,
-            "type": NotificationTypesEnum.NEW_USER.value,
+            "type": NotificationTypesEnum.USER_LEFT.value,
         }
         templates = self.channels_templates.get(notification.channel_id)
         if not templates:

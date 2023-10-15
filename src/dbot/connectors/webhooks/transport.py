@@ -15,8 +15,9 @@ async def initialize_session() -> aiohttp.ClientSession:
 
 
 class WebhooksTransport:
-    def __init__(self, session: aiohttp.ClientSession) -> None:
+    def __init__(self, session: aiohttp.ClientSession, raise_errors: bool = False) -> None:
         self.session = session
+        self.raise_errors = raise_errors
 
     @tenacity.retry(
         reraise=False,
@@ -29,7 +30,8 @@ class WebhooksTransport:
         except Exception as e:
             capture_exception(e)
             logger.info(e)
-            raise
+            if self.raise_errors:
+                raise
 
         # do not retry on >400 status from target
         try:
@@ -37,9 +39,8 @@ class WebhooksTransport:
         except Exception as e:
             capture_exception(e)
             logger.info(e)
+            if self.raise_errors:
+                raise
 
     async def call(self, link: str) -> None:
-        try:
-            await self._call(link=link)
-        except Exception as e:
-            logger.info(e)
+        await self._call(link=link)

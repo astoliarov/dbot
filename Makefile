@@ -1,5 +1,6 @@
 POETRY ?= poetry
 LINT_SOURCES_DIRS = src tests
+MYPY_DIRS = src
 
 ###########################
 # Environment configuration
@@ -47,7 +48,7 @@ lint/isort:
 .PHONY: lint/mypy
 lint/mypy:
 	@echo "\033[92m< linting using mypy...\033[0m"
-	$(POETRY) run mypy --show-error-codes --skip-cache-mtime-checks $(LINT_SOURCES_DIRS)
+	$(POETRY) run mypy --show-error-codes --skip-cache-mtime-checks $(MYPY_DIRS)
 	@echo "\033[92m> done\033[0m"
 	@echo
 
