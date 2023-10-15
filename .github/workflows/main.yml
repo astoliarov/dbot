@@ -85,6 +85,11 @@ jobs:
       - name: Install dependencies
         run: make install-dev
 
+      - name: Activate CI environment
+        uses: c-py/action-dotenv-to-setenv@v2
+        with:
+          env-file: .env.ci
+
       - name: Run tests
         run: make test/integration
 
