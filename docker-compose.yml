@@ -5,9 +5,14 @@ services:
     command: python /app/src/dbot/main.py
     env_file:
       - ./values/local.env
-    profiles: ["app"]
+    profiles: [ "app" ]
   redis:
-    image: "redis:alpine"
+    image: "redis:7.2.1-alpine"
     ports:
       - "6379:6379"
-    profiles: ["infra"]
+    profiles: [ "infra" ]
+  wiremock:
+    image: wiremock/wiremock:3.0.0-1
+    ports:
+      - "8080:8080"
+
