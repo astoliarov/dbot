@@ -29,15 +29,15 @@ class ActivityProcessingService:
             await self.monitoring.on_job_executed_successfully()
 
     async def process(self) -> None:
-        logger.info("starting channels processing")
+        logger.info("channels_processing.started", ids=self.channels)
         for channel_id in self.channels:
             await self._process_chanel(channel_id)
 
         await self.on_proces_finish()
-        logger.info("finished channels processing")
+        logger.info("channels_processing.finished", ids=self.channels)
 
     async def _process_chanel(self, channel_id: int) -> None:
-        logger.debug("started channel processing", channel_id=channel_id)
+        logger.debug("channel_processing.started", channel_id=channel_id)
 
         channel = await self.repository.get(channel_id)
         if channel is None:
@@ -48,3 +48,5 @@ class ActivityProcessingService:
         await self.router.send(notifications)
 
         await self.repository.save(channel)
+
+        logger.debug("channel_processing.finished", channel_id=channel_id)

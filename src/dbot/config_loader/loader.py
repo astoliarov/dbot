@@ -64,7 +64,7 @@ class JSONLoader:
         serializer = MonitorConfigSerializer.model_validate_json(raw)
 
         config = serializer.to_model()
-        logger.debug("loaded config", config=config)
+        logger.debug("config.loaded", config=config)
 
         return serializer.to_model()
 

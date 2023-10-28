@@ -29,13 +29,13 @@ name_to_level = {
 class LoggingConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="dbot_logging_", case_sensitive=False)
 
-    logging_level: LogLevelEnum = LogLevelEnum.DEBUG
+    level: LogLevelEnum = LogLevelEnum.INFO
 
 
 def initialize_logs() -> None:
     logging_config = LoggingConfig()
 
-    level = logging_config.logging_level.value
+    level = logging_config.level.value
 
     structlog.configure(
         processors=[
