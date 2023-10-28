@@ -32,7 +32,7 @@ class DiscordClient(discord.Client, IDiscordClient):
         self.loop.create_task(self.background_worker())
 
     async def background_worker(self) -> None:
-        logger.info("starting background task")
+        logger.info("background_worker.started")
         await self.wait_until_ready()
         while not self.is_closed():
             try:

@@ -70,24 +70,24 @@ class Repository:
 
         users = self.discord_client.get_channel_members(channel_id)
         if users is None:
-            logger.debug("cannot get channel users", channel_id=channel_id)
+            logger.debug("get_channel_users.error", channel_id=channel_id)
             return None
 
         previous_state = await self._load_previous_state(channel_id)
         channel = Channel(id=channel_id, users=users, previous_state=previous_state)
-        logger.debug("loaded channel", channel=channel)
+        logger.debug("channel.loaded", channel=channel)
         return channel
 
     async def _load_previous_state(self, channel_id: int) -> Channel | None:
         channel_key = self._prepare_channel_key(channel_id)
         data = await self.redis_client.get(channel_key)
         if data is None:
-            logger.debug("no previous state", channel_id=channel_id)
+            logger.debug("no_previous_state", channel_id=channel_id)
             return None
 
         state = ChannelState.model_validate_json(data)
         if _get_timestamp() - state.ts > self.STATE_LIFETIME:
-            logger.debug("previous state outdated", channel_id=channel_id)
+            logger.debug("previous_state_outdated", channel_id=channel_id)
             return None
 
         return state.to_model()

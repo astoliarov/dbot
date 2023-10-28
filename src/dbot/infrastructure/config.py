@@ -13,7 +13,6 @@ class Configuration(BaseSettings):
     discord_token: str
     monitor_config_path: str = "./src/dbot/config_loader/config.json"
     sentry_dsn: str = ""
-    healthchecksio_webhook: str = ""
 
 
 config_instance = Configuration()
