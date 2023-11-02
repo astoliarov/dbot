@@ -25,6 +25,7 @@ class ActivityProcessingServiceInstrumentation:
 
         processing_time = time.monotonic() - start
         logger.debug("channel_processing.finished", channel_id=channel_id, processing_time=processing_time)
+        await self._monitoring.fire_channel_processing(channel_id, processing_time)
 
     @contextlib.asynccontextmanager
     async def channels_processing(self, channels: set[int]) -> typing.AsyncIterator[None]:
@@ -37,6 +38,7 @@ class ActivityProcessingServiceInstrumentation:
         logger.info("channels_processing.finished", ids=channels, processing_time=processing_time)
 
         await self._monitoring.on_job_executed_successfully()
+        await self._monitoring.fire_channels_processing(processing_time)
 
 
 class ActivityProcessingService:

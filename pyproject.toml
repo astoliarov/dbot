@@ -17,6 +17,7 @@ redis = "^5.0.0"
 pydantic = "^2.3.0"
 pydantic-settings = "^2.0.3"
 freezegun = "^1.2.2"
+aioprometheus = {extras = ["aiohttp"], version = "^23.3.0"}
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.5.1"
