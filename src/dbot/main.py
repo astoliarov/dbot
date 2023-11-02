@@ -32,6 +32,7 @@ class DBot:
             sentry_sdk.init(config_instance.sentry_dsn)
 
         monitoring = initialize_monitoring()
+        await monitoring.start()
 
         redis_client = await open_redis(redis_config_instance.url)
         repository = Repository(redis_client=redis_client)

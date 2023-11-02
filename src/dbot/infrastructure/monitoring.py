@@ -1,7 +1,12 @@
 from abc import abstractmethod
 
 import aiohttp
+import structlog
+from aioprometheus.collectors import Summary
+from aioprometheus.service import Service
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = structlog.getLogger()
 
 
 class MonitoringConfiguration(BaseSettings):
@@ -9,26 +14,86 @@ class MonitoringConfiguration(BaseSettings):
 
     healthchecksio_webhook: str = ""
 
+    prometheus_metrics_enabled: bool = True
+
 
 class IMonitoring:
+    @abstractmethod
+    async def start(self) -> None:
+        ...
+
     @abstractmethod
     async def on_job_executed_successfully(self) -> None:
         ...
 
+    @abstractmethod
+    async def fire_channel_processing(self, channel_id: int, time: float) -> None:
+        ...
 
-def initialize_monitoring() -> IMonitoring | None:
-    monitoring_config = MonitoringConfiguration()
-
-    if not monitoring_config.healthchecksio_webhook:
-        return None
-
-    return HealthChecksIOMonitoring(monitoring_config.healthchecksio_webhook)
+    @abstractmethod
+    async def fire_channels_processing(self, time: float) -> None:
+        ...
 
 
-class HealthChecksIOMonitoring(IMonitoring):
+class HealthChecksIOClient:
     def __init__(self, webhook: str) -> None:
         self.webhook = webhook
         self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=15))
 
-    async def on_job_executed_successfully(self) -> None:
+    async def fire(self) -> None:
         await self.session.get(self.webhook)
+
+
+def initialize_monitoring() -> IMonitoring:
+    monitoring_config = MonitoringConfiguration()
+
+    health_checks_client = None
+    if monitoring_config.healthchecksio_webhook:
+        health_checks_client = HealthChecksIOClient(monitoring_config.healthchecksio_webhook)
+
+    prometheus_monitoring = None
+    if monitoring_config.prometheus_metrics_enabled:
+        prometheus_monitoring = PrometheusMonitoring()
+
+    return Monitoring(health_checks_client, prometheus_monitoring)
+
+
+class PrometheusMonitoring:
+    def __init__(self) -> None:
+        self._service = Service()
+        self._channel_processing_summary = Summary("channel_processing", "One channel processing time")
+        self._channels_processing_summary = Summary("channels_processing", "All channels processing time")
+
+    async def start(self) -> None:
+        logger.info("prometheus_service.started")
+        await self._service.start(port=3333)
+
+    def fire_channel_processing(self, channel_id: int, time: float) -> None:
+        self._channel_processing_summary.observe({"channel": str(channel_id)}, time)
+
+    def fire_channels_processing(self, time: float) -> None:
+        self._channels_processing_summary.observe({}, time)
+
+
+class Monitoring(IMonitoring):
+    def __init__(
+        self, health_checks_client: HealthChecksIOClient | None, prometheus_monitoring: PrometheusMonitoring | None
+    ) -> None:
+        self._health_checks_client = health_checks_client
+        self._prometheus = prometheus_monitoring
+
+    async def start(self) -> None:
+        if self._prometheus:
+            await self._prometheus.start()
+
+    async def on_job_executed_successfully(self) -> None:
+        if self._health_checks_client:
+            await self._health_checks_client.fire()
+
+    async def fire_channel_processing(self, channel_id: int, time: float) -> None:
+        if self._prometheus:
+            self._prometheus.fire_channel_processing(channel_id, time)
+
+    async def fire_channels_processing(self, time: float) -> None:
+        if self._prometheus:
+            self._prometheus.fire_channels_processing(time)

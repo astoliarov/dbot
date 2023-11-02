@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 
 from dbot.connectors.router import NotificationRouter
-from dbot.infrastructure.monitoring import HealthChecksIOMonitoring
+from dbot.infrastructure.monitoring import Monitoring
 from dbot.model.channel import Channel
 from dbot.model.notifications import Notification
 from dbot.repository import Repository
@@ -17,7 +17,7 @@ def repository():
 
 @pytest.fixture
 def monitoring():
-    return mock.AsyncMock(spec=HealthChecksIOMonitoring)
+    return mock.AsyncMock(spec=Monitoring)
 
 
 @pytest.fixture
