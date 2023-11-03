@@ -4,6 +4,7 @@ from integration.clients.wiremock import WireMockClient
 
 from dbot.connectors.webhooks.transport import WebhooksTransport
 from dbot.connectors.webhooks.webhooks import WebhooksConnector
+from dbot.infrastructure.monitoring import Monitoring, PrometheusMonitoring
 from dbot.model import MonitorConfig, NewUserInChannelNotification, User
 from dbot.model.config import ChannelMonitorConfig, WebhooksTargetConfig
 from dbot.model.notifications import (
@@ -20,6 +21,14 @@ async def wiremock():
     client = WireMockClient(WIREMOCK_HOST)
     await client.reset()
     return client
+
+
+@pytest.fixture
+async def monitoring() -> Monitoring:
+    PrometheusMonitoring.clear()
+
+    prometheus_monitoring = PrometheusMonitoring(True)
+    return Monitoring(None, prometheus_monitoring)
 
 
 @pytest.fixture
@@ -52,15 +61,15 @@ async def config() -> MonitorConfig:
 
 
 @pytest.fixture
-async def connector(config):
+async def connector(config, monitoring):
     transport = WebhooksTransport(ClientSession(), raise_errors=True)
-    return WebhooksConnector(transport, config)
+    return WebhooksConnector(transport, config, monitoring)
 
 
 class TestCaseWebhooksConnector:
-    async def test__send__new_user_no_reraise_and_error__no_error(self, wiremock, config):
+    async def test__send__new_user_no_reraise_and_error__no_error(self, wiremock, config, monitoring):
         transport = WebhooksTransport(ClientSession(), raise_errors=False)
-        connector = WebhooksConnector(transport, config)
+        connector = WebhooksConnector(transport, config, monitoring)
 
         connector.transport.raise_errors = False
         notification = NewUserInChannelNotification(
@@ -73,9 +82,9 @@ class TestCaseWebhooksConnector:
 
         await connector.send([notification])
 
-    async def test__send__new_user_reraise_and_error__error_risen(self, wiremock, config):
+    async def test__send__new_user_reraise_and_error__error_risen(self, wiremock, config, monitoring):
         transport = WebhooksTransport(ClientSession(), raise_errors=True)
-        connector = WebhooksConnector(transport, config)
+        connector = WebhooksConnector(transport, config, monitoring)
 
         notification = NewUserInChannelNotification(
             channel_id=1,
