@@ -4,6 +4,7 @@ import pytest
 
 from dbot.connectors.webhooks.transport import WebhooksTransport
 from dbot.connectors.webhooks.webhooks import WebhooksConnector
+from dbot.infrastructure.monitoring import Monitoring
 from dbot.model import MonitorConfig, NewUserInChannelNotification, User
 from dbot.model.config import ChannelMonitorConfig, WebhooksTargetConfig
 from dbot.model.notifications import (
@@ -50,8 +51,13 @@ async def transport():
 
 
 @pytest.fixture
-async def connector(transport, config):
-    return WebhooksConnector(transport, config)
+async def monitoring():
+    return Mock(spec=Monitoring)
+
+
+@pytest.fixture
+async def connector(transport, config, monitoring):
+    return WebhooksConnector(transport, config, monitoring)
 
 
 class TestCaseWebhooksConnector:

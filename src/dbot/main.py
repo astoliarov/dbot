@@ -42,18 +42,18 @@ class DBot:
 
         self.session = await initialize_session()
         transport = WebhooksTransport(self.session)
-        webhooks_connector = WebhooksConnector(transport, monitor_config)
-        redis_connector = RedisConnector(redis_client, monitor_config)
+        webhooks_connector = WebhooksConnector(transport, monitor_config, monitoring)
+        redis_connector = RedisConnector(redis_client, monitor_config, monitoring)
 
         router = NotificationRouter(monitor_config)
         router.register_connector(TargetTypeEnum.WEBHOOKS, webhooks_connector)
         router.register_connector(TargetTypeEnum.REDIS, redis_connector)
 
-        router = NotificationRouterInstrumentation(router, monitoring)
+        instrumented_router = NotificationRouterInstrumentation(router, monitoring)
 
         processing_service = ActivityProcessingService(
             repository=repository,
-            router=router,
+            router=instrumented_router,
             channels=monitor_config.channels_ids,
             monitoring=monitoring,
         )

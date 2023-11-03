@@ -4,16 +4,16 @@ import typing
 
 import structlog
 
-from dbot.connectors.router import INotificationRouter, NotificationRouter
+from dbot.connectors.router import INotificationRouter
 from dbot.dscrd.abstract import IDiscordClient
-from dbot.infrastructure.monitoring import IMonitoring
+from dbot.infrastructure.monitoring import Monitoring
 from dbot.repository import Repository
 
 logger = structlog.getLogger()
 
 
 class ActivityProcessingServiceInstrumentation:
-    def __init__(self, monitoring: IMonitoring) -> None:
+    def __init__(self, monitoring: Monitoring) -> None:
         self._monitoring = monitoring
 
     @contextlib.asynccontextmanager
@@ -47,7 +47,7 @@ class ActivityProcessingService:
         repository: Repository,
         router: INotificationRouter,
         channels: set[int],
-        monitoring: IMonitoring,
+        monitoring: Monitoring,
     ) -> None:
         self.repository = repository
         self.router = router

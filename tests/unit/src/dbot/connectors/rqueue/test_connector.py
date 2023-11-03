@@ -6,6 +6,7 @@ import pytest
 import redis
 
 from dbot.connectors.rqueue.connector import RedisConnector
+from dbot.infrastructure.monitoring import Monitoring
 from dbot.model import MonitorConfig, User
 from dbot.model.config import ChannelMonitorConfig, RedisTargetConfig
 from dbot.model.notifications import (
@@ -24,13 +25,18 @@ def client():
 
 
 @pytest.fixture
+async def monitoring():
+    return mock.AsyncMock(spec=Monitoring)
+
+
+@pytest.fixture
 def time_freeze():
     with freezegun.freeze_time("2023-10-10T10:10:10"):
         yield
 
 
 @pytest.fixture
-def connector(client):
+def connector(client, monitoring):
     return RedisConnector(
         client,
         MonitorConfig(
@@ -44,6 +50,7 @@ def connector(client):
                 )
             ]
         ),
+        monitoring,
     )
 
 

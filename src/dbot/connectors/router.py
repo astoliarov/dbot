@@ -4,7 +4,7 @@ import time
 import structlog
 
 from dbot.connectors.abstract import IConnector
-from dbot.infrastructure.monitoring import IMonitoring
+from dbot.infrastructure.monitoring import Monitoring
 from dbot.model.config import (
     ChannelMonitorConfig,
     MonitorConfig,
@@ -50,7 +50,7 @@ class NotificationRouter(INotificationRouter):
 
 
 class NotificationRouterInstrumentation(INotificationRouter):
-    def __init__(self, router: NotificationRouter, monitoring: IMonitoring) -> None:
+    def __init__(self, router: NotificationRouter, monitoring: Monitoring) -> None:
         self._router = router
         self._monitoring = monitoring
 

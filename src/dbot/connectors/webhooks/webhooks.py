@@ -9,6 +9,7 @@ from jinja2 import Template
 
 from dbot.connectors.abstract import IConnector, NotificationTypesEnum
 from dbot.connectors.webhooks.transport import WebhooksTransport
+from dbot.infrastructure.monitoring import Monitoring
 from dbot.model import NewUserInChannelNotification, UsersConnectedToChannelNotification
 from dbot.model.config import ChannelMonitorConfig, MonitorConfig
 from dbot.model.notifications import (
@@ -32,8 +33,10 @@ class WebhooksConnector(IConnector):
         self,
         transport: WebhooksTransport,
         config: MonitorConfig,
+        monitoring: Monitoring,
     ):
         self.transport = transport
+        self.monitoring = monitoring
         self.channels_templates = {
             config.channel_id: self._init_channel_templates(config) for config in config.channels
         }
@@ -71,13 +74,7 @@ class WebhooksConnector(IConnector):
             "user_id": notification.user.id,
             "type": NotificationTypesEnum.NEW_USER.value,
         }
-        templates = self.channels_templates.get(notification.channel_id)
-        if not templates:
-            return
-
-        for template in templates[TemplatesEnum.NEW_USER]:
-            link = template.render(**data)
-            await self.transport.call(link)
+        await self._execute_send(data, notification.channel_id, TemplatesEnum.NEW_USER)
 
     @_send_one.register
     async def _(self, notification: UserLeftChannelNotification) -> None:
@@ -87,13 +84,7 @@ class WebhooksConnector(IConnector):
             "user_id": notification.user.id,
             "type": NotificationTypesEnum.USER_LEFT.value,
         }
-        templates = self.channels_templates.get(notification.channel_id)
-        if not templates:
-            return
-
-        for template in templates[TemplatesEnum.USER_LEFT]:
-            link = template.render(**data)
-            await self.transport.call(link)
+        await self._execute_send(data, notification.channel_id, TemplatesEnum.USER_LEFT)
 
     @_send_one.register
     async def _(self, notification: UsersConnectedToChannelNotification) -> None:
@@ -105,13 +96,7 @@ class WebhooksConnector(IConnector):
             "id": notification.channel_id,
             "type": NotificationTypesEnum.USERS_CONNECTED.value,
         }
-        templates = self.channels_templates.get(notification.channel_id)
-        if not templates:
-            return
-
-        for template in templates[TemplatesEnum.USERS_CONNECTED]:
-            link = template.render(**data)
-            await self.transport.call(link)
+        await self._execute_send(data, notification.channel_id, TemplatesEnum.USERS_CONNECTED)
 
     @_send_one.register
     async def _(self, notification: UsersLeftChannelNotification) -> None:
@@ -119,10 +104,14 @@ class WebhooksConnector(IConnector):
             "id": notification.channel_id,
             "type": NotificationTypesEnum.USERS_LEFT.value,
         }
-        templates = self.channels_templates.get(notification.channel_id)
+        await self._execute_send(data, notification.channel_id, TemplatesEnum.USERS_LEFT)
+
+    async def _execute_send(self, data: dict[str, typing.Any], channel_id: int, template_type: TemplatesEnum) -> None:
+        templates = self.channels_templates.get(channel_id)
         if not templates:
             return
 
-        for template in templates[TemplatesEnum.USERS_LEFT]:
+        for template in templates[template_type]:
             link = template.render(**data)
             await self.transport.call(link)
+            await self.monitoring.fire_webhooks_count()

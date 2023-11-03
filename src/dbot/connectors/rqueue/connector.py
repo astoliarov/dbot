@@ -7,6 +7,7 @@ import redis
 from pydantic import BaseModel
 
 from dbot.connectors.abstract import IConnector, NotificationTypesEnum
+from dbot.infrastructure.monitoring import Monitoring
 from dbot.model import MonitorConfig
 from dbot.model.notifications import (
     NewUserInChannelNotification,
@@ -26,9 +27,10 @@ class Message(BaseModel):
 
 
 class RedisConnector(IConnector):
-    def __init__(self, client: redis.asyncio.Redis, config: MonitorConfig) -> None:
+    def __init__(self, client: redis.asyncio.Redis, config: MonitorConfig, monitoring: Monitoring) -> None:
         self.client = client
         self.config = config
+        self.monitoring = monitoring
 
         self.channel_queue_map = self._prepare_queues_for_channels(config)
 
@@ -104,3 +106,5 @@ class RedisConnector(IConnector):
             raise TypeError("Expected awaitable, got %r" % type(future))
 
         await future
+
+        await self.monitoring.fire_redis_events_count()

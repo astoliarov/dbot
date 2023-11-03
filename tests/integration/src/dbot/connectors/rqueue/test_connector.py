@@ -6,6 +6,7 @@ import redis
 
 from dbot.connectors.rqueue.connector import RedisConnector
 from dbot.infrastructure.config import redis_config_instance
+from dbot.infrastructure.monitoring import Monitoring, PrometheusMonitoring
 from dbot.model import (
     MonitorConfig,
     NewUserInChannelNotification,
@@ -23,8 +24,16 @@ async def client() -> redis.Redis:
     return await open_redis(redis_config_instance.url)
 
 
+@pytest.fixture
+async def monitoring() -> Monitoring:
+    PrometheusMonitoring.clear()
+
+    prometheus_monitoring = PrometheusMonitoring(True)
+    return Monitoring(None, prometheus_monitoring)
+
+
 @pytest.fixture()
-async def connector(client):
+async def connector(client, monitoring):
     return RedisConnector(
         client,
         MonitorConfig(
@@ -38,6 +47,7 @@ async def connector(client):
                 )
             ]
         ),
+        monitoring,
     )
 
 
