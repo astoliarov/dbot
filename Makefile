@@ -52,8 +52,16 @@ lint/mypy:
 	@echo "\033[92m> done\033[0m"
 	@echo
 
+.PHONY: lint/flake8
+lint/flake8:
+	@echo "\033[92m< linting using flake8...\033[0m"
+	$(POETRY) run flake8 $(LINT_SOURCES_DIRS)
+	@echo "\033[92m> done\033[0m"
+	@echo
+
+
 .PHONY: lint
-lint: lint/black lint/isort lint/mypy
+lint: lint/black lint/isort lint/flake8 lint/mypy
 
 
 .PHONY: fmt/black

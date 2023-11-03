@@ -1,6 +1,3 @@
-import asyncio
-import traceback
-
 import aiohttp
 import structlog
 import tenacity

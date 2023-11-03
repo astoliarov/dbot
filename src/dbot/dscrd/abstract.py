@@ -1,4 +1,3 @@
-import typing
 from abc import ABC, abstractmethod
 
 from dbot.model import User
