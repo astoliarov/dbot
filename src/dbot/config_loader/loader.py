@@ -5,7 +5,6 @@ from dbot.model.config import (
     ChannelMonitorConfig,
     MonitorConfig,
     RedisTargetConfig,
-    TargetTypeEnum,
     WebhooksTargetConfig,
 )
 

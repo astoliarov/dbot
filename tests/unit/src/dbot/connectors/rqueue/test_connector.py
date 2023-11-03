@@ -1,9 +1,7 @@
-import json
 from unittest import mock
 
 import freezegun
 import pytest
-import redis
 
 from dbot.connectors.rqueue.connector import RedisConnector
 from dbot.infrastructure.monitoring import Monitoring
