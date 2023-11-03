@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 import aiohttp
 import structlog
-from aioprometheus.collectors import Summary
+from aioprometheus.collectors import Counter, Summary
 from aioprometheus.service import Service
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -15,6 +15,8 @@ class MonitoringConfiguration(BaseSettings):
     healthchecksio_webhook: str = ""
 
     prometheus_metrics_enabled: bool = True
+    prometheus_metrics_port: int = 3333
+    prometheus_metrics_host: str = "0.0.0.0"
 
 
 class IMonitoring:
@@ -32,6 +34,14 @@ class IMonitoring:
 
     @abstractmethod
     async def fire_channels_processing(self, time: float) -> None:
+        ...
+
+    @abstractmethod
+    async def fire_notifications_processing(self, channel_id: int, time: float) -> None:
+        ...
+
+    @abstractmethod
+    async def fire_notifications_count(self, channel_id: int, count: int) -> None:
         ...
 
 
@@ -63,6 +73,8 @@ class PrometheusMonitoring:
         self._service = Service()
         self._channel_processing_summary = Summary("channel_processing", "One channel processing time")
         self._channels_processing_summary = Summary("channels_processing", "All channels processing time")
+        self._notifications_counter = Counter("notifications_count", "Notifications count")
+        self._notifications_processing_summary = Summary("notifications_processing", "Notifications processing time")
 
     async def start(self) -> None:
         logger.info("prometheus_service.started")
@@ -73,6 +85,12 @@ class PrometheusMonitoring:
 
     def fire_channels_processing(self, time: float) -> None:
         self._channels_processing_summary.observe({}, time)
+
+    def fire_notifications_processing(self, channel_id: int, time: float) -> None:
+        self._notifications_processing_summary.observe({"channel": str(channel_id)}, time)
+
+    def fire_notifications_count(self, channel_id: int, count: int) -> None:
+        self._notifications_counter.add({"channel": str(channel_id)}, count)
 
 
 class Monitoring(IMonitoring):
@@ -97,3 +115,11 @@ class Monitoring(IMonitoring):
     async def fire_channels_processing(self, time: float) -> None:
         if self._prometheus:
             self._prometheus.fire_channels_processing(time)
+
+    async def fire_notifications_processing(self, channel_id: int, time: float) -> None:
+        if self._prometheus:
+            self._prometheus.fire_notifications_processing(channel_id, time)
+
+    async def fire_notifications_count(self, channel_id: int, count: int) -> None:
+        if self._prometheus:
+            self._prometheus.fire_notifications_count(channel_id, count)

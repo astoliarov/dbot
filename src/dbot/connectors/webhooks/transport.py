@@ -29,18 +29,22 @@ class WebhooksTransport:
             response = await self.session.get(link, allow_redirects=True)
         except Exception as e:
             capture_exception(e)
-            logger.info(e)
+            logger.error(e)
             if self.raise_errors:
                 raise
+            else:
+                return
 
         # do not retry on >400 status from target
         try:
             response.raise_for_status()
         except Exception as e:
             capture_exception(e)
-            logger.info(e)
+            logger.error(e)
             if self.raise_errors:
                 raise
+            else:
+                return
 
     async def call(self, link: str) -> None:
         await self._call(link=link)

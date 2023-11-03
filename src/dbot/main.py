@@ -5,7 +5,7 @@ import sentry_sdk
 import structlog
 
 from dbot.config_loader.loader import JSONLoader
-from dbot.connectors.router import NotificationRouter
+from dbot.connectors.router import NotificationRouter, NotificationRouterInstrumentation
 from dbot.connectors.rqueue.connector import RedisConnector
 from dbot.connectors.webhooks.transport import WebhooksTransport, initialize_session
 from dbot.connectors.webhooks.webhooks import WebhooksConnector
@@ -48,6 +48,8 @@ class DBot:
         router = NotificationRouter(monitor_config)
         router.register_connector(TargetTypeEnum.WEBHOOKS, webhooks_connector)
         router.register_connector(TargetTypeEnum.REDIS, redis_connector)
+
+        router = NotificationRouterInstrumentation(router, monitoring)
 
         processing_service = ActivityProcessingService(
             repository=repository,

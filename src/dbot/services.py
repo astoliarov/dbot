@@ -4,7 +4,7 @@ import typing
 
 import structlog
 
-from dbot.connectors.router import NotificationRouter
+from dbot.connectors.router import INotificationRouter, NotificationRouter
 from dbot.dscrd.abstract import IDiscordClient
 from dbot.infrastructure.monitoring import IMonitoring
 from dbot.repository import Repository
@@ -45,7 +45,7 @@ class ActivityProcessingService:
     def __init__(
         self,
         repository: Repository,
-        router: NotificationRouter,
+        router: INotificationRouter,
         channels: set[int],
         monitoring: IMonitoring,
     ) -> None:
@@ -70,6 +70,7 @@ class ActivityProcessingService:
 
             notifications = channel.generate_notifications()
 
-            await self.router.send(notifications)
+            if notifications:
+                await self.router.send(notifications)
 
             await self.repository.save(channel)
