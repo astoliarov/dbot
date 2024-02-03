@@ -1,4 +1,4 @@
-FROM python:3.11 as base
+FROM python:3.12.1 as base
 
 RUN mkdir /app
 WORKDIR /app
