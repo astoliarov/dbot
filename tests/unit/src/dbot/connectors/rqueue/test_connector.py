@@ -54,6 +54,52 @@ def connector(client, monitoring):
     )
 
 
+async def test__send__two_queues__new_user_in_channel(client, monitoring, time_freeze):
+    notification = NewUserInChannelNotification(
+        user=User(username="test", id=1),
+        channel_id=1,
+    )
+
+    connector = RedisConnector(
+        client,
+        MonitorConfig(
+            channels=[
+                ChannelMonitorConfig(
+                    channel_id=1,
+                    redis_queues=[
+                        RedisTargetConfig(
+                            queue=TEST_QUEUE_NAME,
+                        ),
+                        RedisTargetConfig(
+                            queue="test_queue_2",
+                        ),
+                    ],
+                    webhooks=None,
+                )
+            ]
+        ),
+        monitoring,
+    )
+
+    await connector.send([notification])
+
+    first_call = connector.client.rpush.call_args_list[0]
+    args = first_call[0]
+    assert args[0] == "test_queue"
+    assert (
+        args[1]
+        == '{"version":1,"type":"new_user","data":{"id":1,"username":"test"},"channel_id":1,"happened_at":"2023-10-10T10:10:10Z"}'
+    )
+
+    second_call = connector.client.rpush.call_args_list[1]
+    args = second_call[0]
+    assert args[0] == "test_queue_2"
+    assert (
+        args[1]
+        == '{"version":1,"type":"new_user","data":{"id":1,"username":"test"},"channel_id":1,"happened_at":"2023-10-10T10:10:10Z"}'
+    )
+
+
 async def test__send__new_user_in_channel(connector, time_freeze):
     notification = NewUserInChannelNotification(
         user=User(username="test", id=1),
