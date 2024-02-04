@@ -5,11 +5,7 @@ import structlog
 
 from dbot.connectors.abstract import IConnector
 from dbot.infrastructure.monitoring import Monitoring
-from dbot.model.config import (
-    ChannelMonitorConfig,
-    MonitorConfig,
-    TargetTypeEnum,
-)
+from dbot.model.config import ChannelMonitorConfig, MonitorConfig, TargetTypeEnum
 from dbot.model.notifications import Notification
 
 logger = structlog.getLogger()
