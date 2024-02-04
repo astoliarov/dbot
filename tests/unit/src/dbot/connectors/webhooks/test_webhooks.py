@@ -39,7 +39,7 @@ async def config() -> MonitorConfig:
                         "http://localhost:8080/webhook-target?channel_id={{id}}&event={{type}}",
                     ],
                 ),
-                redis=None,
+                redis_queues=None,
             )
         ]
     )

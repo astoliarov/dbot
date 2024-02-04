@@ -35,19 +35,16 @@ class RedisTargetConfigSerializer(BaseModel):
         )
 
 
-TargetSerializer = RedisTargetConfigSerializer | WebhooksTargetConfigSerializer
-
-
 class ChannelMonitorConfigSerializer(BaseModel):
     channel_id: int
     webhooks: WebhooksTargetConfigSerializer | None = None
-    redis: RedisTargetConfigSerializer | None = None
+    redis_queues: list[RedisTargetConfigSerializer] | None = None
 
     def to_model(self) -> ChannelMonitorConfig:
         return ChannelMonitorConfig(
             channel_id=self.channel_id,
             webhooks=self.webhooks.to_model() if self.webhooks else None,
-            redis=self.redis.to_model() if self.redis else None,
+            redis_queues=[item.to_model() for item in self.redis_queues] if self.redis_queues else [],
         )
 
 

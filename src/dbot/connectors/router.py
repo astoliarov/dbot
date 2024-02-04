@@ -5,12 +5,7 @@ import structlog
 
 from dbot.connectors.abstract import IConnector
 from dbot.infrastructure.monitoring import Monitoring
-from dbot.model.config import (
-    ChannelMonitorConfig,
-    MonitorConfig,
-    Target,
-    TargetTypeEnum,
-)
+from dbot.model.config import ChannelMonitorConfig, MonitorConfig, TargetTypeEnum
 from dbot.model.notifications import Notification
 
 logger = structlog.getLogger()
@@ -39,14 +34,14 @@ class NotificationRouter(INotificationRouter):
             if not config:
                 continue
 
-            for target in config.targets:
-                connector = self._get_connector(target)
+            for target_type in config.available_target_types:
+                connector = self._get_connector(target_type)
                 if not connector:
                     continue
                 await connector.send([notification])
 
-    def _get_connector(self, target: Target) -> IConnector | None:
-        return self._connectors.get(target.type, None)
+    def _get_connector(self, target_type: TargetTypeEnum) -> IConnector | None:
+        return self._connectors.get(target_type, None)
 
 
 class NotificationRouterInstrumentation(INotificationRouter):
