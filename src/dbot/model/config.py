@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 
 class TargetTypeEnum(Enum):
@@ -29,18 +28,23 @@ class RedisTargetConfig:
         return TargetTypeEnum.REDIS
 
 
-Target = RedisTargetConfig | WebhooksTargetConfig
-
-
 @dataclass
 class ChannelMonitorConfig:
     channel_id: int
-    webhooks: Optional[WebhooksTargetConfig]
-    redis: Optional[RedisTargetConfig]
+    webhooks: WebhooksTargetConfig | None
+    redis_queues: list[RedisTargetConfig] | None
 
     @property
-    def targets(self) -> list[Target]:
-        return [target for target in (self.webhooks, self.redis) if target]
+    def available_target_types(self) -> list[TargetTypeEnum]:
+        targets = []
+
+        if self.webhooks:
+            targets.append(TargetTypeEnum.WEBHOOKS)
+
+        if self.redis_queues:
+            targets.append(TargetTypeEnum.REDIS)
+
+        return targets
 
 
 @dataclass

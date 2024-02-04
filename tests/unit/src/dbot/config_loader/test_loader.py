@@ -34,9 +34,11 @@ def test__channel_config_loader__two_targets():
                     "users_left_webhooks": ["http://localhost:8002"],
                     "user_left_webhooks": ["http://localhost:8003"],
                 },
-                "redis": {
-                    "queue": "test_queue",
-                },
+                "redis_queues": [
+                    {
+                        "queue": "test_queue",
+                    },
+                ],
             }
         ],
     }
@@ -53,9 +55,11 @@ def test__channel_config_loader__two_targets():
                     users_left_webhooks=["http://localhost:8002"],
                     user_left_webhooks=["http://localhost:8003"],
                 ),
-                redis=RedisTargetConfig(
-                    queue="test_queue",
-                ),
+                redis_queues=[
+                    RedisTargetConfig(
+                        queue="test_queue",
+                    ),
+                ],
             ),
         ]
     )

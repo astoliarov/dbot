@@ -41,9 +41,11 @@ def connector(client, monitoring):
             channels=[
                 ChannelMonitorConfig(
                     channel_id=1,
-                    redis=RedisTargetConfig(
-                        queue=TEST_QUEUE_NAME,
-                    ),
+                    redis_queues=[
+                        RedisTargetConfig(
+                            queue=TEST_QUEUE_NAME,
+                        ),
+                    ],
                     webhooks=None,
                 )
             ]

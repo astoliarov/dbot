@@ -1,5 +1,7 @@
+import asyncio
 import datetime
 import inspect
+from collections import defaultdict
 from functools import singledispatchmethod
 from typing import Any
 
@@ -32,20 +34,21 @@ class RedisConnector(IConnector):
         self.config = config
         self.monitoring = monitoring
 
-        self.channel_queue_map = self._prepare_queues_for_channels(config)
+        self.channel_queue_map: dict[int, list[str]] = self._prepare_queues_for_channels(config)
 
-    def _prepare_queues_for_channels(self, config: MonitorConfig) -> dict[int, str]:
-        channel_queue_map = {}
+    def _prepare_queues_for_channels(self, config: MonitorConfig) -> dict[int, list[str]]:
+        channel_queue_map = defaultdict(list)
 
         for channel in config.channels:
-            if channel.redis is None:
+            if channel.redis_queues is None:
                 continue
 
-            channel_queue_map[channel.channel_id] = channel.redis.queue
+            for target in channel.redis_queues:
+                channel_queue_map[channel.channel_id].append(target.queue)
 
         return channel_queue_map
 
-    def _get_queue(self, channel_id: int) -> str | None:
+    def _get_queue(self, channel_id: int) -> list[str] | None:
         return self.channel_queue_map.get(channel_id)
 
     async def send(self, notifications: list[Notification]) -> None:
@@ -92,19 +95,23 @@ class RedisConnector(IConnector):
         await self._send(notification.channel_id, data, NotificationTypesEnum.USERS_LEFT, 1)
 
     async def _send(self, channel_id: int, data: dict[str, Any], _type: NotificationTypesEnum, version: int) -> None:
-        queue = self._get_queue(channel_id)
-        if not queue:
+        queues = self._get_queue(channel_id)
+        if not queues:
             return
 
         happened_at = datetime.datetime.now(tz=datetime.timezone.utc)
         message = Message(version=version, type=_type, data=data, happened_at=happened_at, channel_id=channel_id)
         raw = message.model_dump_json()
 
-        future = self.client.rpush(queue, raw)
+        futures = []
+        for queue in queues:
+            future = self.client.rpush(queue, raw)
 
-        if not inspect.isawaitable(future):
-            raise TypeError("Expected awaitable, got %r" % type(future))
+            if not inspect.isawaitable(future):
+                raise TypeError(f"Expected awaitable, got {type(future)}")
 
-        await future
+            futures.append(future)
+
+        await asyncio.gather(*futures)
 
         await self.monitoring.fire_redis_events_count()
