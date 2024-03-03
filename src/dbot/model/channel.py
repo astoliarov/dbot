@@ -1,6 +1,8 @@
 import typing
 from dataclasses import dataclass
 
+import structlog
+
 from dbot.model.notifications import (
     NewUserInChannelNotification,
     Notification,
@@ -9,6 +11,8 @@ from dbot.model.notifications import (
     UsersLeftChannelNotification,
 )
 from dbot.model.user import User
+
+logger = structlog.get_logger(__name__)
 
 
 @dataclass
@@ -35,10 +39,12 @@ class Channel:
             old_user = old_users.get(user_id)
             if not old_user:
                 notifications.append(NewUserInChannelNotification(user=user, channel_id=self.id))
+                logger.info("NewUserInChannelNotification.generated", old_users=old_users, new_users=new_users)
 
         for user_id, user in old_users.items():
             if user_id not in new_users:
                 notifications.append(UserLeftChannelNotification(user=user, channel_id=self.id))
+                logger.info("UserLeftChannelNotification.generated", old_users=old_users, new_users=new_users)
 
         return notifications
 
@@ -50,8 +56,16 @@ class Channel:
 
         if not self.previous_state.users and self.users:
             notifications.append(UsersConnectedToChannelNotification(users=self.users, channel_id=self.id))
+            logger.info(
+                "UsersConnectedToChannelNotification.generated",
+                old_users=self.previous_state.users,
+                new_users=self.users,
+            )
 
         if self.previous_state.users and not self.users:
             notifications.append(UsersLeftChannelNotification(channel_id=self.id))
+            logger.info(
+                "UsersLeftChannelNotification.generated", old_users=self.previous_state.users, new_users=self.users
+            )
 
         return notifications
