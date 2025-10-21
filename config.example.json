@@ -1,0 +1,88 @@
+{
+  "_comment": "This is an example configuration file. Copy this to your desired location and update the values.",
+  "_usage": "Set DBOT_MONITOR_CONFIG_PATH environment variable to point to your config file",
+  "channels": [
+    {
+      "_description": "Example 1: Monitor a voice channel with both webhooks and Redis notifications",
+      "channel_id": 1234567890123456789,
+      "webhooks": {
+        "new_user_webhooks": [
+          "https://hook.integromat.com/your_webhook_id?channel_id={{id}}&event={{type}}&username={{username}}&user_id={{user_id}}"
+        ],
+        "user_left_webhooks": [
+          "https://hook.integromat.com/your_webhook_id?channel_id={{id}}&event={{type}}&username={{username}}&user_id={{user_id}}"
+        ],
+        "users_connected_webhooks": [
+          "https://hook.integromat.com/your_webhook_id?channel_id={{id}}&event={{type}}&usernames={{usernames_safe}}"
+        ],
+        "users_left_webhooks": [
+          "https://hook.integromat.com/your_webhook_id?channel_id={{id}}&event={{type}}"
+        ]
+      },
+      "redis": {
+        "queue": "dbot.events.channel1"
+      }
+    },
+    {
+      "_description": "Example 2: Monitor a channel with only webhook notifications",
+      "channel_id": 9876543210987654321,
+      "webhooks": {
+        "new_user_webhooks": [
+          "https://hooks.zapier.com/hooks/catch/your_hook_id/?channel={{id}}&user={{username}}&uid={{user_id}}"
+        ],
+        "user_left_webhooks": [
+          "https://hooks.zapier.com/hooks/catch/your_hook_id/?channel={{id}}&user={{username}}&uid={{user_id}}"
+        ],
+        "users_connected_webhooks": [],
+        "users_left_webhooks": []
+      }
+    },
+    {
+      "_description": "Example 3: Monitor a channel with only Redis queue notifications",
+      "channel_id": 1111222233334444555,
+      "redis": {
+        "queue": "dbot.events.vip_channel"
+      }
+    },
+    {
+      "_description": "Example 4: Multiple webhooks for the same event (useful for different integrations)",
+      "channel_id": 5555444433332222111,
+      "webhooks": {
+        "new_user_webhooks": [
+          "https://hook.integromat.com/webhook1?channel={{id}}&user={{username}}",
+          "https://hooks.slack.com/services/your/slack/webhook",
+          "https://discord.com/api/webhooks/your/discord/webhook"
+        ],
+        "user_left_webhooks": [],
+        "users_connected_webhooks": [],
+        "users_left_webhooks": []
+      }
+    }
+  ],
+  "_template_variables": {
+    "description": "Available template variables for webhook URLs",
+    "new_user_and_user_left_events": {
+      "id": "Channel ID",
+      "type": "Event type (new_user, user_left, users_connected, users_left)",
+      "username": "Discord username",
+      "user_id": "Discord user ID"
+    },
+    "users_connected_event": {
+      "id": "Channel ID",
+      "type": "Event type",
+      "usernames_safe": "Comma-separated, URL-encoded list of usernames"
+    },
+    "users_left_event": {
+      "id": "Channel ID",
+      "type": "Event type"
+    }
+  },
+  "_notes": [
+    "channel_id: Discord channel ID (right-click channel in Discord with Developer Mode enabled)",
+    "webhooks: Configure which webhooks to call for each event type",
+    "redis: Configure Redis queue name for event publishing",
+    "You can use either webhooks, redis, or both for each channel",
+    "Webhook URLs support Jinja2 templates with variables: {{id}}, {{type}}, {{username}}, {{user_id}}, {{usernames_safe}}",
+    "usernames_safe is URL-encoded, suitable for query parameters"
+  ]
+}
